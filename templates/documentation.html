@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>API Documentation - Emotion Detection</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/documentation.css') }}">
+</head>
+<body>
+
+<div id="loader-bar"></div>
+
+<!-- ══ HEADER ══ -->
+<header>
+  <div class="left-section">
+    <div class="menu-toggle" onclick="openMenu()">☰</div>
+    <div class="logo">Emotion Detection</div>
+  </div>
+  <nav class="top-nav">
+    <a href="/">Home</a>
+    <div class="dropdown">
+      <a href="#">Product ▾</a>
+      <div class="dropdown-menu">
+        <a href="/face-detection">Face Detection</a>
+      </div>
+    </div>
+    <div class="dropdown">
+      <a href="#">Use Case ▾</a>
+      <div class="dropdown-menu">
+        <a href="/education">Education</a>
+        <a href="/healthcare">Healthcare</a>
+        <a href="/security">Security</a>
+      </div>
+    </div>
+    <div class="dropdown">
+      <a href="#">API ▾</a>
+      <div class="dropdown-menu">
+        <a href="/documentation">Documentation</a>
+      </div>
+    </div>
+    <a href="/login" class="login-btn">Login</a>
+  </nav>
+</header>
+
+<!-- ══ SIDEBAR ══ -->
+<div id="sidebar" class="sidebar">
+  <span class="close-btn" onclick="closeMenu()">✖</span>
+  <a href="/">🏠 Home</a>
+  <div class="sidebar-toggle" id="productToggle" onclick="toggleSidebar('product')">
+    <span>📦 Product</span><span class="arrow">▼</span>
+  </div>
+  <div class="sidebar-dropdown" id="productDropdown">
+    <a href="/face-detection">🧠 Face Detection</a>
+  </div>
+  <div class="sidebar-toggle" id="usecaseToggle" onclick="toggleSidebar('usecase')">
+    <span>💡 Use Case</span><span class="arrow">▼</span>
+  </div>
+  <div class="sidebar-dropdown" id="usecaseDropdown">
+    <a href="/education">🎓 Education</a>
+    <a href="/security">🔒 Security</a>
+    <a href="/healthcare">🏥 Healthcare</a>
+  </div>
+  <a href="#">⚙️ API</a>
+  <a href="/history">📜 History</a>
+  <a href="/contact">📞 Contact Us</a>
+  <a href="#">📄 Terms &amp; Conditions</a>
+</div>
+
+<!-- ══ DOCS LAYOUT ══ -->
+<div class="docs-layout">
+
+  <!-- Left Nav -->
+  <nav class="docs-nav">
+    <div class="docs-nav-title">Documentation</div>
+    <a href="#overview" class="active">Overview</a>
+    <a href="#auth">Authentication</a>
+
+    <div class="nav-group">
+      <div class="nav-group-title">Endpoint</div>
+      <a href="#detect-emotion">Detect Emotion</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">Reference</div>
+      <a href="#errors">Error Codes</a>
+      <a href="#rate-limits">Rate Limits</a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="docs-content">
+
+    <!-- ── HERO ── -->
+    <div class="docs-hero" id="overview">
+      <div class="tag">⚙️ API v2.0</div>
+      <h1>Emotion Detection <span>API</span></h1>
+      <p>
+        A powerful REST API to detect human emotions, faces, and expressions
+        from images or live video streams. Integrate in minutes with any language.
+      </p>
+      <div class="base-url-box">
+        <span class="label">Base URL</span>
+        <span class="url">https://api.emotiondetection.ai/v2</span>
+      </div>
+    </div>
+
+    <!-- ── AUTH ── -->
+    <h2 class="section-heading" id="auth">🔑 <span>Authentication</span></h2>
+    <div class="auth-box">
+      All API requests require an <strong>API Key</strong> passed in the request header.<br><br>
+      <strong>Header:</strong> <code style="color:#00ff9d;font-family:'Fira Code',monospace;">Authorization: Bearer YOUR_API_KEY</code><br><br>
+      Get your API key from your <a href="/login" style="color:var(--accent);">dashboard</a> after signing in. Keys are prefixed with <strong>ed_live_</strong> for production and <strong>ed_test_</strong> for sandbox.
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Example Header</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><span class="key">Authorization</span>: Bearer ed_live_xxxxxxxxxxxxxxxxxxxxxxxx
+<span class="key">Content-Type</span>: application/json</pre>
+    </div>
+
+    <!-- ══ ENDPOINT 1: DETECT EMOTION ══ -->
+    <h2 class="section-heading" id="detect-emotion">📡 <span>Detect Emotion — Image</span></h2>
+
+    <div class="endpoint-card">
+      <div class="endpoint-header">
+        <span class="method post">POST</span>
+        <span class="endpoint-path">/detect/emotion</span>
+        <span class="endpoint-desc">Detect emotions from an image URL or base64</span>
+      </div>
+      <div class="endpoint-body">
+        <p class="desc">Analyzes a face in the provided image and returns detected emotions with confidence scores.</p>
+
+        <div class="sub-heading">Request Parameters</div>
+        <table class="params-table">
+          <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+          <tr>
+            <td>image_url <span class="required-badge">required*</span></td>
+            <td>string</td>
+            <td>Publicly accessible URL of the image</td>
+          </tr>
+          <tr>
+            <td>image_base64 <span class="required-badge">required*</span></td>
+            <td>string</td>
+            <td>Base64 encoded image (use if no URL)</td>
+          </tr>
+          <tr>
+            <td>min_confidence <span class="optional-badge">optional</span></td>
+            <td>float</td>
+            <td>Minimum confidence threshold 0.0–1.0 (default: 0.5)</td>
+          </tr>
+          <tr>
+            <td>return_landmarks <span class="optional-badge">optional</span></td>
+            <td>boolean</td>
+            <td>Return facial landmark points (default: false)</td>
+          </tr>
+        </table>
+
+        <div class="sub-heading">Code Example</div>
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab(this, 'em-py')">Python</button>
+          <button class="tab-btn" onclick="switchTab(this, 'em-js')">JavaScript</button>
+          <button class="tab-btn" onclick="switchTab(this, 'em-curl')">cURL</button>
+        </div>
+
+        <div id="em-py" class="tab-content active">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">Python</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="kw">import</span> requests
+
+url = <span class="str">"https://api.emotiondetection.ai/v2/detect/emotion"</span>
+headers = {
+    <span class="str">"Authorization"</span>: <span class="str">"Bearer ed_live_xxxxxxxxxxxx"</span>,
+    <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span>
+}
+payload = {
+    <span class="str">"image_url"</span>: <span class="str">"https://example.com/face.jpg"</span>,
+    <span class="str">"min_confidence"</span>: <span class="num">0.6</span>,
+    <span class="str">"return_landmarks"</span>: <span class="kw">False</span>
+}
+
+response = requests.<span class="fn">post</span>(url, json=payload, headers=headers)
+<span class="fn">print</span>(response.<span class="fn">json</span>())</pre>
+          </div>
+        </div>
+
+        <div id="em-js" class="tab-content">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">JavaScript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="kw">const</span> response = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">"https://api.emotiondetection.ai/v2/detect/emotion"</span>, {
+  method: <span class="str">"POST"</span>,
+  headers: {
+    <span class="str">"Authorization"</span>: <span class="str">"Bearer ed_live_xxxxxxxxxxxx"</span>,
+    <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span>
+  },
+  body: <span class="fn">JSON.stringify</span>({
+    image_url: <span class="str">"https://example.com/face.jpg"</span>,
+    min_confidence: <span class="num">0.6</span>,
+    return_landmarks: <span class="kw">false</span>
+  })
+});
+<span class="kw">const</span> data = <span class="kw">await</span> response.<span class="fn">json</span>();
+console.<span class="fn">log</span>(data);</pre>
+          </div>
+        </div>
+
+        <div id="em-curl" class="tab-content">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">cURL</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre>curl -X POST https://api.emotiondetection.ai/v2/detect/emotion \
+  -H <span class="str">"Authorization: Bearer ed_live_xxxxxxxxxxxx"</span> \
+  -H <span class="str">"Content-Type: application/json"</span> \
+  -d <span class="str">'{"image_url":"https://example.com/face.jpg","min_confidence":0.6}'</span></pre>
+          </div>
+        </div>
+
+        <div class="sub-heading">Response</div>
+        <div class="response-box">
+          <div class="response-header">
+            <span class="status-badge status-200">200 OK</span>
+            <span style="font-size:0.8rem;color:var(--muted);">application/json</span>
+          </div>
+          <pre>{
+  <span class="key">"success"</span>: <span class="kw">true</span>,
+  <span class="key">"face_id"</span>: <span class="str">"face_a1b2c3"</span>,
+  <span class="key">"emotions"</span>: {
+    <span class="key">"happy"</span>:    <span class="num">0.82</span>,
+    <span class="key">"neutral"</span>:  <span class="num">0.10</span>,
+    <span class="key">"sad"</span>:      <span class="num">0.04</span>,
+    <span class="key">"angry"</span>:    <span class="num">0.02</span>,
+    <span class="key">"surprise"</span>: <span class="num">0.01</span>,
+    <span class="key">"fear"</span>:     <span class="num">0.01</span>
+  },
+  <span class="key">"dominant_emotion"</span>: <span class="str">"happy"</span>,
+  <span class="key">"confidence"</span>: <span class="num">0.82</span>,
+  <span class="key">"processing_time_ms"</span>: <span class="num">74</span>
+}</pre>
+        </div>
+      </div>
+    </div>
+
+
+        <!-- ══ ERROR CODES ══ -->
+    <h2 class="section-heading" id="errors">⚠️ <span>Error Codes</span></h2>
+    <table class="error-table">
+      <tr><th>Code</th><th>Status</th><th>Description</th></tr>
+      <tr><td>ED_401</td><td>401 Unauthorized</td><td>Missing or invalid API key</td></tr>
+      <tr><td>ED_403</td><td>403 Forbidden</td><td>API key does not have permission</td></tr>
+      <tr><td>ED_404</td><td>404 Not Found</td><td>Image URL not reachable or endpoint wrong</td></tr>
+      <tr><td>ED_422</td><td>422 Unprocessable</td><td>No face detected in the image</td></tr>
+      <tr><td>ED_429</td><td>429 Too Many Requests</td><td>Rate limit exceeded — slow down</td></tr>
+      <tr><td>ED_500</td><td>500 Server Error</td><td>Internal server error — contact support</td></tr>
+    </table>
+
+    <!-- ══ RATE LIMITS ══ -->
+    <h2 class="section-heading" id="rate-limits">🚦 <span>Rate Limits</span></h2>
+    <table class="error-table">
+      <tr><th>Plan</th><th>Requests / min</th><th>Requests / month</th></tr>
+      <tr><td>Free Trial</td><td>10</td><td>1,000</td></tr>
+      <tr><td>Starter</td><td>60</td><td>50,000</td></tr>
+      <tr><td>Pro</td><td>300</td><td>500,000</td></tr>
+      <tr><td>Enterprise</td><td>Unlimited</td><td>Custom</td></tr>
+    </table>
+
+  </div><!-- /docs-content -->
+</div><!-- /docs-layout -->
+
+<!-- ══ HELP BUTTON ══ -->
+<div class="help-btn" onclick="openHelp()">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+</div>
+
+<!-- ══ SIDE DRAWER ══ -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeHelp()"></div>
+<div class="help-drawer" id="helpDrawer">
+
+  <div class="drawer-header">
+    <div class="drawer-title">
+      <div class="drawer-icon">🎧</div>
+      <div>
+        <h3>Need Assistance?</h3>
+        <p>We typically reply within a few hours</p>
+      </div>
+    </div>
+    <button class="drawer-close" onclick="closeHelp()">×</button>
+  </div>
+
+  <div class="drawer-online">
+    <span class="online-dot"></span> Our team is online
+  </div>
+
+  <div class="drawer-body">
+
+    <div class="drawer-field">
+      <label>Full Name</label>
+      <div class="input-wrap">
+        <span class="input-icon">👤</span>
+        <input type="text" placeholder="Enter your full name">
+      </div>
+    </div>
+
+    <div class="drawer-field">
+      <label>Phone Number</label>
+      <div class="input-wrap">
+        <span class="input-icon">📞</span>
+        <input type="tel" placeholder="+91 98765 43210">
+      </div>
+    </div>
+
+    <div class="drawer-field">
+      <label>Subject</label>
+      <div class="input-wrap">
+        <span class="input-icon">📋</span>
+        <select>
+          <option value="" disabled selected>Select a topic</option>
+          <option>General Enquiry</option>
+          <option>Technical Support</option>
+          <option>API Help</option>
+          <option>Billing</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="drawer-field">
+      <label>Message</label>
+      <textarea placeholder="Describe your issue or question..."></textarea>
+    </div>
+
+    <button class="drawer-submit" onclick="submitDrawer()">
+      Send Message &nbsp;🚀
+    </button>
+
+    <div class="drawer-success" id="drawerSuccess">
+      ✅ Message sent! We'll get back to you soon.
+    </div>
+
+  </div>
+
+  <div class="drawer-footer">
+    <a href="/contact">📞 Contact Us</a>
+    <a href="/documentation">📄 API Docs</a>
+  </div>
+
+</div>
+
+<footer>&copy; 2025 Emotion Detection. All rights reserved.</footer>
+
+<!-- ══ JS ══ -->
+<script>
+  function openMenu()  { document.getElementById("sidebar").classList.add("active"); }
+  function closeMenu() { document.getElementById("sidebar").classList.remove("active"); }
+
+  function openHelp() {
+    document.getElementById("helpDrawer").classList.add("open");
+    document.getElementById("drawerOverlay").classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+  function closeHelp() {
+    document.getElementById("helpDrawer").classList.remove("open");
+    document.getElementById("drawerOverlay").classList.remove("open");
+    document.body.style.overflow = "";
+  }
+  function submitDrawer() {
+    document.getElementById("drawerSuccess").style.display = "block";
+    setTimeout(() => {
+      document.getElementById("drawerSuccess").style.display = "none";
+    }, 3500);
+  }
+
+  function toggleSidebar(section) {
+    const d = document.getElementById(section + 'Dropdown');
+    const t = document.getElementById(section + 'Toggle');
+    d.classList.toggle('open', !d.classList.contains('open'));
+    t.classList.toggle('open', !t.classList.contains('open'));
+  }
+
+  function switchTab(btn, targetId) {
+    const parent = btn.closest('.endpoint-body') || btn.closest('.docs-content');
+    btn.closest('.tabs').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const group = btn.closest('.endpoint-body') || btn.parentElement.parentElement;
+    group.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    const target = document.getElementById(targetId);
+    if (target) target.classList.add('active');
+  }
+
+  function copyCode(btn) {
+    const pre = btn.closest('.code-block').querySelector('pre');
+    navigator.clipboard.writeText(pre.innerText).then(() => {
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 2000);
+    });
+  }
+
+  // Docs nav active on scroll
+  const sections = document.querySelectorAll('[id]');
+  const navLinks = document.querySelectorAll('.docs-nav a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 100) current = s.id;
+    });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  });
+
+  document.querySelectorAll("a").forEach(link => {
+    link.addEventListener("click", function() {
+      let bar = document.getElementById("loader-bar");
+      bar.style.opacity = "1"; bar.style.width = "100%";
+    });
+  });
+
+  window.onload = function() {
+    let bar = document.getElementById("loader-bar");
+    bar.style.width = "100%";
+    setTimeout(() => { bar.style.opacity = "0"; bar.style.width = "0%"; }, 400);
+  };
+</script>
+
+
+
+</body>
+</html>

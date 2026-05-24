@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Image — Emotion Detection</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/upload.css') }}">
+  <style>
+    .loading-overlay {
+      position: fixed; inset: 0;
+      background: #020817;
+      z-index: 99999;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+    .loading-overlay.show { display: flex; }
+    .loading-logo {
+      font-family: 'Orbitron', monospace;
+      font-size: 16px; font-weight: 900;
+      color: #58a6ff; letter-spacing: 3px;
+    }
+    .loading-ring {
+      width: 60px; height: 60px;
+      border: 3px solid rgba(88,166,255,0.15);
+      border-top-color: #58a6ff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    .loading-text {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 14px; font-weight: 600;
+      color: #475569; letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <!-- Loading overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-logo">⚡ Emotion AI</div>
+    <div class="loading-ring"></div>
+    <div class="loading-text">Analyzing image...</div>
+  </div>
+
+  <div class="page">
+
+    <a href="/" class="back-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M5 12l7-7M5 12l7 7"/>
+      </svg>
+      Back to Home
+    </a>
+
+    <div class="card">
+
+      <div class="card-header">
+        <div class="logo-tag">
+          <div class="pulse-dot"></div>
+          Emotion Detection
+        </div>
+        <h1>Image <span class="accent">Upload</span></h1>
+        <p class="subtitle">Upload a photo and our AI will detect emotions in milliseconds</p>
+      </div>
+
+      
+      <form
+        action="/upload"
+        method="POST"
+        enctype="multipart/form-data"
+        id="uploadForm"
+        onsubmit="return onSubmit()"
+      >
+
+        <!-- Drop Zone -->
+        <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+          <div class="drop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+          </div>
+          <div class="drop-text">
+            <span class="drop-main">Drag & drop your image here</span>
+            <span class="drop-sub">or click to browse files</span>
+          </div>
+          <div class="drop-formats">JPG · PNG · WEBP · BMP</div>
+          <input type="file" name="image" id="fileInput" accept="image/*" required>
+        </div>
+
+        <!-- Preview -->
+        <div class="preview-box" id="previewBox">
+          <div class="preview-inner">
+            <img id="previewImg" src="" alt="Preview" />
+            <div class="preview-overlay">
+              <span class="preview-name" id="previewName"></span>
+              <button type="button" class="remove-btn" onclick="removeFile(event)">✕ Remove</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit button -->
+        <button type="submit" class="btn-detect ready" id="submitBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="M21 21l-4.35-4.35"/>
+          </svg>
+          Detect Emotion
+        </button>
+
+      </form>
+
+      <div class="info-chips">
+        <div class="chip"><span>🎯</span> 99% Accuracy</div>
+        <div class="chip"><span>⚡</span> Under 80ms</div>
+        <div class="chip"><span>😊</span> 7 Emotions</div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const fileInput   = document.getElementById('fileInput');
+    const dropZone    = document.getElementById('dropZone');
+    const previewBox  = document.getElementById('previewBox');
+    const previewImg  = document.getElementById('previewImg');
+    const previewName = document.getElementById('previewName');
+
+    // File selected via click
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files[0]) showPreview(fileInput.files[0]);
+    });
+
+    // Drag & drop
+    dropZone.addEventListener('dragover', e => {
+      e.preventDefault();
+      dropZone.classList.add('drag-over');
+    });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', e => {
+      e.preventDefault();
+      dropZone.classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        fileInput.files = dt.files;
+        showPreview(file);
+      }
+    });
+
+    function showPreview(file) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        previewImg.src          = e.target.result;
+        previewName.textContent = file.name;
+        dropZone.style.display  = 'none';
+        previewBox.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeFile(e) {
+      e.stopPropagation();
+      fileInput.value          = '';
+      previewImg.src           = '';
+      previewBox.style.display = 'none';
+      dropZone.style.display   = 'flex';
+    }
+
+    // Show loading spinner on submit
+    function onSubmit() {
+      if (!fileInput.files[0]) {
+        alert('select image before !');
+        return false;
+      }
+      document.getElementById('loadingOverlay').classList.add('show');
+      return true; // ✅ allow normal form POST
+    }
+  </script>
+
+</body>
+</html>

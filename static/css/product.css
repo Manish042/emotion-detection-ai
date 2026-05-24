@@ -1,0 +1,82 @@
+/* HERO */
+.product-hero{
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:60px;
+background:linear-gradient(to right,#0f172a,#1e3a8a);
+color:white;
+}
+
+.product-text{
+max-width:500px;
+}
+
+.product-hero img{
+width:400px;
+border-radius:10px;
+}
+
+/* FEATURES */
+.features{
+padding:60px;
+text-align:center;
+}
+
+.feature-box{
+display:flex;
+gap:20px;
+justify-content:center;
+}
+
+.feature{
+background:#1e293b;
+padding:20px;
+border-radius:10px;
+width:250px;
+}
+
+/* DEMO */
+.demo{
+padding:60px;
+text-align:center;
+}
+
+/* MENU */
+.menu-toggle{
+  position:fixed;
+  top:20px;
+  left:20px;
+  font-size:28px;
+  color:#00e5ff;
+  cursor:pointer;
+  z-index:1000;
+}
+
+/* SIDEBAR */
+.sidebar{
+  position:fixed;
+  top:0;
+  left:-280px;
+  width:260px;
+  height:100%;
+  background:#081120;
+  transition:0.3s;
+  z-index:999;
+  padding-top:30px;
+  box-shadow:0 0 20px rgba(0,0,0,0.5);
+}
+
+.sidebar.active{
+  left:0;
+}
+
+.close-btn{
+  background:none;
+  border:none;
+  color:white;
+  font-size:22px;
+  margin-left:210px;
+  cursor:pointer;
+}
+

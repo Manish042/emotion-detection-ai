@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Result — Emotion Detection</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#020817; --card:#0d1117; --border:#1e293b; --blue:#58a6ff; --muted:#64748b; --text:#e2eaff; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+
+    body {
+      font-family:'Rajdhani',sans-serif;
+      background:var(--bg); color:var(--text); min-height:100vh;
+    }
+    body::before {
+      content:''; position:fixed; inset:0;
+      background-image:
+        linear-gradient(rgba(88,166,255,0.03) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(88,166,255,0.03) 1px,transparent 1px);
+      background-size:40px 40px; pointer-events:none; z-index:0;
+    }
+
+    .page {
+      position:relative; z-index:1; min-height:100vh;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      padding:40px 20px;
+    }
+
+    .back-link {
+      display:flex; align-items:center; gap:8px;
+      color:var(--muted); text-decoration:none;
+      font-size:13px; font-weight:600; letter-spacing:1px;
+      margin-bottom:20px; transition:color 0.2s;
+      align-self:flex-start; max-width:620px; width:100%;
+    }
+    .back-link:hover { color:var(--blue); }
+    .back-link svg { width:16px; height:16px; }
+
+    .card {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:20px; width:100%; max-width:620px; overflow:hidden;
+    }
+
+    /* ✅ IMAGE SECTION — no zoom, full image visible */
+    .img-section {
+      position: relative;
+      width: 100%;
+      background: #020817;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+      max-height: 480px;
+      overflow: hidden;
+    }
+
+    .result-image {
+      width: 100%;
+      height: auto;
+      max-height: 480px;
+      object-fit: contain;
+      object-position: center;
+      display: block;
+    }
+
+    .img-overlay {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 80px;
+      background: linear-gradient(to top, rgba(13,17,23,0.95), transparent);
+      pointer-events: none;
+    }
+
+    /* Emotion badge on image */
+    .img-badge {
+      position: absolute;
+      bottom: 16px; left: 50%;
+      transform: translateX(-50%);
+      background: rgba(2,8,23,0.88);
+      border: 1px solid rgba(88,166,255,0.2);
+      backdrop-filter: blur(8px);
+      border-radius: 100px;
+      padding: 8px 20px;
+      font-family: 'Orbitron', monospace;
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 1px;
+      white-space: nowrap;
+      z-index: 2;
+    }
+
+    .result-section { padding:1.8rem 2rem; }
+    .result-label { font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:14px; }
+
+    .emotion-display { display:flex; align-items:center; gap:16px; margin-bottom:20px; }
+    .emotion-emoji   { font-size:52px; line-height:1; }
+    .emotion-name    { font-family:'Orbitron',monospace; font-size:28px; font-weight:900; text-transform:uppercase; letter-spacing:2px; line-height:1; margin-bottom:6px; }
+    .emotion-desc    { font-size:13px; color:var(--muted); line-height:1.6; }
+
+    .conf-section    { margin-bottom:20px; }
+    .conf-label      { display:flex; justify-content:space-between; font-size:12px; color:var(--muted); letter-spacing:1px; margin-bottom:8px; }
+    .conf-track      { height:6px; background:rgba(255,255,255,0.06); border-radius:4px; overflow:hidden; }
+    .conf-fill       { height:100%; border-radius:4px; transition:width 1.2s ease; }
+
+    .all-emotions    { margin-bottom:20px; }
+    .emo-row         { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+    .emo-row-label   { font-size:12px; width:72px; color:var(--muted); font-weight:600; text-transform:capitalize; }
+    .emo-row-track   { flex:1; height:5px; background:rgba(255,255,255,0.05); border-radius:3px; overflow:hidden; }
+    .emo-row-fill    { height:100%; border-radius:3px; transition:width 1.2s ease; }
+    .emo-row-pct     { font-size:12px; color:var(--muted); width:36px; text-align:right; }
+
+    .btns { display:flex; gap:10px; flex-wrap:wrap; }
+    .btn  {
+      flex:1; min-width:120px; padding:12px; border-radius:12px;
+      font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:700;
+      letter-spacing:1px; text-transform:uppercase; cursor:pointer;
+      transition:all 0.2s; text-decoration:none; text-align:center;
+      display:flex; align-items:center; justify-content:center; gap:6px;
+    }
+    .btn-try      { background:linear-gradient(135deg,#1e40af,#3b82f6); border:none; color:white; }
+    .btn-try:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(59,130,246,0.4); }
+    .btn-download { background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.3); color:#22c55e; }
+    .btn-download:hover { background:rgba(34,197,94,0.2); transform:translateY(-2px); }
+    .btn-home     { background:transparent; border:1px solid var(--border); color:var(--muted); }
+    .btn-home:hover { border-color:var(--blue); color:var(--blue); }
+
+    @media(max-width:560px) {
+      .result-section { padding:1.5rem; }
+      .emotion-name   { font-size:22px; }
+      .btns           { flex-direction:column; }
+      .result-image   { max-height:320px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <a href="/upload-page" class="back-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M5 12l7-7M5 12l7 7"/>
+      </svg>
+      Upload Another
+    </a>
+
+    <div class="card">
+
+      <!-- IMAGE SECTION -->
+      <div class="img-section">
+        {% if image %}
+        <img
+          class="result-image"
+          src="{{ url_for('static', filename=image) }}"
+          alt="Uploaded"
+          id="resultImg"
+        />
+        <div class="img-overlay"></div>
+        <div class="img-badge" id="imgBadge">😐 {{ emotion | upper }}</div>
+        {% endif %}
+      </div>
+
+      <div class="result-section">
+
+        <div class="result-label">🔍 Detection Result</div>
+
+        <div class="emotion-display">
+          <div class="emotion-emoji" id="emojiEl">😐</div>
+          <div>
+            <div class="emotion-name" id="emotionName">{{ emotion }}</div>
+            <div class="emotion-desc" id="emotionDesc">Analyzing...</div>
+          </div>
+        </div>
+
+        <div class="conf-section">
+          <div class="conf-label">
+            <span>Confidence</span>
+            <span id="confPct">—</span>
+          </div>
+          <div class="conf-track">
+            <div class="conf-fill" id="confFill" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div class="all-emotions" id="allEmotions"></div>
+
+        <div class="btns">
+          <a href="/upload-page" class="btn btn-try">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            Try Another
+          </a>
+          <a id="downloadBtn" class="btn btn-download" href="#" download="emotion_result.jpg">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Download
+          </a>
+          <a href="/" class="btn btn-home">🏠 Home</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const emotion = "{{ emotion }}".toLowerCase().trim();
+
+    const info_map = {
+      happy:    { emoji:'😊', color:'#22c55e', conf:88, desc:'Joyful expression detected. Person appears cheerful and positive.' },
+      sad:      { emoji:'😢', color:'#3b82f6', conf:82, desc:'Sadness detected. Facial features indicate a downcast state.' },
+      angry:    { emoji:'😠', color:'#ef4444', conf:79, desc:'Anger detected. Furrowed brows and tense muscles identified.' },
+      fear:     { emoji:'😨', color:'#a855f7', conf:75, desc:'Fear detected. Wide eyes and tense features identified.' },
+      surprise: { emoji:'😲', color:'#f59e0b', conf:84, desc:'Surprise detected. Raised eyebrows and open mouth identified.' },
+      disgust:  { emoji:'🤢', color:'#84cc16', conf:77, desc:'Disgust detected. Nose wrinkle and lip curl identified.' },
+      neutral:  { emoji:'😐', color:'#58a6ff', conf:91, desc:'Neutral expression. No strong emotion present.' },
+      'no face detected': { emoji:'🔍', color:'#64748b', conf:0, desc:'No face detected. Please try a clearer photo with a visible face.' }
+    };
+
+    const info = info_map[emotion] || info_map['neutral'];
+
+    // Update emoji badge on image
+    const badge = document.getElementById('imgBadge');
+    if (badge) {
+      badge.textContent = info.emoji + ' ' + emotion.toUpperCase();
+      badge.style.borderColor = info.color;
+      badge.style.color = info.color;
+    }
+
+    document.getElementById('emojiEl').textContent     = info.emoji;
+    document.getElementById('emotionDesc').textContent = info.desc;
+    document.getElementById('emotionName').style.color = info.color;
+
+    const conf = info.conf;
+    document.getElementById('confPct').textContent       = conf + '%';
+    document.getElementById('confFill').style.background = info.color;
+    setTimeout(() => { document.getElementById('confFill').style.width = conf + '%'; }, 100);
+
+    // Emotion bars
+    const allE = { happy:0, sad:0, angry:0, fear:0, surprise:0, disgust:0, neutral:0 };
+    if (allE.hasOwnProperty(emotion)) allE[emotion] = conf;
+    const others = Object.keys(allE).filter(k => k !== emotion);
+    const rem    = 100 - conf;
+    const share  = Math.floor(rem / others.length);
+    others.forEach((k,i) => { allE[k] = i === others.length-1 ? rem - share*(others.length-1) : share; });
+
+    const container = document.getElementById('allEmotions');
+    Object.entries(allE).forEach(([em, pct]) => {
+      const c      = (info_map[em]||{}).color || '#58a6ff';
+      const isMain = em === emotion;
+      const d      = document.createElement('div');
+      d.className  = 'emo-row';
+      d.innerHTML  =
+        '<div class="emo-row-label" style="color:' + (isMain?c:'') + '">' + em + '</div>' +
+        '<div class="emo-row-track"><div class="emo-row-fill" style="width:' + pct + '%;background:' + (isMain?c:'rgba(255,255,255,0.08)') + '"></div></div>' +
+        '<div class="emo-row-pct">' + pct + '%</div>';
+      container.appendChild(d);
+    });
+
+    // Download button
+    const img = document.getElementById('resultImg');
+    if (img) {
+      document.getElementById('downloadBtn').href = img.src;
+    }
+  </script>
+</body>
+</html>

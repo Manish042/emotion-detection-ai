@@ -1,0 +1,148 @@
+/* ===== EDUCATION PAGE FULL DESIGN ===== */
+
+.edu-body{
+background:linear-gradient(to right,#020617,#0f172a);
+color:white;
+font-family:'Poppins', sans-serif;
+margin:0;
+padding:40px;
+}
+
+/* Heading */
+.edu-heading{
+text-align:center;
+font-size:36px;
+margin-bottom:20px;
+}
+
+/* Intro */
+.edu-intro{
+max-width:800px;
+margin:0 auto 40px auto;
+text-align:center;
+line-height:1.8;
+opacity:0.9;
+}
+
+/* Container */
+.edu-container{
+display:flex;
+justify-content:center;
+gap:30px;
+flex-wrap:wrap;
+}
+
+/* Cards */
+.edu-card{
+background:#1e293b;
+padding:30px;
+border-radius:15px;
+width:260px;
+text-align:center;
+cursor:pointer;
+transition:0.3s;
+}
+
+/* Hover */
+.edu-card:hover{
+transform:translateY(-10px) scale(1.05);
+box-shadow:0 15px 25px rgba(0,0,0,0.5);
+background:#334155;
+}
+
+/* Title */
+.edu-card h3{
+color:#38bdf8;
+margin-bottom:10px;
+}
+
+/* Text */
+.edu-card p{
+font-size:14px;
+opacity:0.8;
+}
+
+/* Responsive */
+@media(max-width:768px){
+.edu-container{
+flex-direction:column;
+align-items:center;
+}
+}
+
+
+/* ===== BANNER ===== */
+
+.edu-banner{
+position:relative;
+width:100%;
+height:300px;
+overflow:hidden;
+border-radius:15px;
+margin-bottom:40px;
+}
+
+.edu-banner img{
+width:100%;
+height:100%;
+object-fit:cover;
+filter:brightness(0.6); /* dark overlay effect */
+}
+
+/* Text on banner */
+.banner-text{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%, -50%);
+text-align:center;
+color:white;
+}
+
+.banner-text h2{
+font-size:32px;
+margin-bottom:10px;
+}
+
+.banner-text p{
+font-size:16px;
+opacity:0.9;
+}
+
+
+
+.edu-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px 40px;
+background:#020617;
+position:sticky;
+top:0;
+z-index:1000;
+}
+
+/* Logo */
+.logo{
+font-size:22px;
+font-weight:700;
+color:#38bdf8;
+}
+
+/* Nav links */
+.edu-nav a{
+color:white;
+margin-left:25px;
+text-decoration:none;
+font-size:16px;
+transition:0.3s;
+}
+
+/* Hover */
+.edu-nav a:hover{
+color:#38bdf8;
+}
+
+
+
+

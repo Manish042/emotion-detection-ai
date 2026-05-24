@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Live Detection</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+    }
+
+    body{
+      background:#020817;
+      color:white;
+      font-family:'Poppins',sans-serif;
+      min-height:100vh;
+      overflow:hidden;
+      position:relative;
+    }
+
+    /* background glow */
+    body::before{
+      content:'';
+      position:absolute;
+      width:500px;
+      height:500px;
+      background:rgba(0,140,255,0.08);
+      filter:blur(120px);
+      top:-150px;
+      left:-150px;
+      border-radius:50%;
+    }
+
+    body::after{
+      content:'';
+      position:absolute;
+      width:400px;
+      height:400px;
+      background:rgba(168,85,247,0.08);
+      filter:blur(120px);
+      bottom:-150px;
+      right:-100px;
+      border-radius:50%;
+    }
+
+    .container{
+      position:relative;
+      z-index:2;
+      max-width:1200px;
+  
+      margin:auto;
+      padding:40px 20px;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:30px;
+    }
+
+    .logo{
+      font-family:'Orbitron',sans-serif;
+      font-size:24px;
+      font-weight:900;
+      color:#58a6ff;
+      letter-spacing:2px;
+    }
+
+    .back-btn{
+      text-decoration:none;
+      color:white;
+      border:1px solid rgba(255,255,255,0.1);
+      padding:10px 18px;
+      border-radius:10px;
+      transition:0.3s;
+    }
+
+    .back-btn:hover{
+      background:#0f172a;
+    }
+
+    .main{
+      display:grid;
+      grid-template-columns:2fr 1fr;
+      gap:25px;
+    }
+
+    .camera-box{
+      background:#081120;
+      border:1px solid rgba(88,166,255,0.15);
+      border-radius:24px;
+      padding:20px;
+      position:relative;
+      overflow:hidden;
+      min-height:500px;
+    }
+
+    .camera-screen{
+      height:420px;
+      border-radius:20px;
+      background:
+      linear-gradient(135deg,#0f172a,#111827);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      border:2px dashed rgba(88,166,255,0.2);
+      position:relative;
+    }
+
+    .camera-circle{
+      width:120px;
+      height:120px;
+      border-radius:50%;
+      border:4px solid #58a6ff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:50px;
+      animation:pulse 2s infinite;
+    }
+
+    @keyframes pulse{
+      0%{transform:scale(1);}
+      50%{transform:scale(1.08);}
+      100%{transform:scale(1);}
+    }
+
+    .camera-text{
+      margin-top:20px;
+      font-size:18px;
+      color:#94a3b8;
+    }
+
+    .controls{
+      display:flex;
+      gap:15px;
+      margin-top:20px;
+    }
+
+    .btn{
+      flex:1;
+      border:none;
+      padding:14px;
+      border-radius:14px;
+      font-size:15px;
+      font-weight:600;
+      cursor:pointer;
+      transition:0.3s;
+    }
+
+    .start-btn{
+      background:#0ea5e9;
+      color:white;
+    }
+
+    .start-btn:hover{
+      background:#0284c7;
+    }
+
+    .stop-btn{
+      background:#ef4444;
+      color:white;
+    }
+
+    .stop-btn:hover{
+      background:#dc2626;
+    }
+
+    /* side panel */
+    .side-panel{
+      background:#081120;
+      border:1px solid rgba(88,166,255,0.15);
+      border-radius:24px;
+      padding:24px;
+    }
+
+    .panel-title{
+      font-size:20px;
+      margin-bottom:20px;
+      font-weight:700;
+    }
+
+    .timer-box{
+      background:#0f172a;
+      border-radius:20px;
+      padding:30px 20px;
+      text-align:center;
+      margin-bottom:25px;
+      border:1px solid rgba(88,166,255,0.15);
+    }
+
+    .timer-label{
+      color:#94a3b8;
+      margin-bottom:10px;
+      font-size:14px;
+      letter-spacing:1px;
+    }
+
+    .timer{
+      font-size:48px;
+      font-weight:800;
+      color:#58a6ff;
+      font-family:'Orbitron',sans-serif;
+    }
+
+    .status{
+      background:#0f172a;
+      border-radius:16px;
+      padding:18px;
+      line-height:1.7;
+      color:#94a3b8;
+      font-size:14px;
+    }
+
+    .warning{
+      margin-top:20px;
+      background:rgba(239,68,68,0.1);
+      border:1px solid rgba(239,68,68,0.25);
+      color:#ef4444;
+      padding:16px;
+      border-radius:14px;
+      display:none;
+      font-weight:600;
+      line-height:1.6;
+    }
+
+    @media(max-width:900px){
+      .main{
+        grid-template-columns:1fr;
+      }
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="topbar">
+    <div class="logo">Emotion Detection</div>
+
+    <a href="/" class="back-btn">
+      ← Back Home
+    </a>
+  </div>
+
+  <div class="main">
+
+    <!-- CAMERA SECTION -->
+    <div class="camera-box">
+
+      <div class="camera-screen" id="cameraScreen">
+
+        <div class="camera-circle">
+          🎥
+        </div>
+
+        <div class="camera-text" id="cameraText">
+          Camera Ready For Live Emotion Detection
+        </div>
+
+      </div>
+
+      <div class="controls">
+        <button class="btn start-btn" onclick="startCamera()">
+          Start Camera
+        </button>
+
+        <button class="btn stop-btn" onclick="stopCamera()">
+          Stop Camera
+        </button>
+      </div>
+
+    </div>
+
+    <!-- SIDE PANEL -->
+    <div class="side-panel">
+
+      <div class="panel-title">
+        Demo Session
+      </div>
+
+      <div class="timer-box">
+        <div class="timer-label">
+          FREE DEMO TIME
+        </div>
+
+        <div class="timer" id="timer">
+          01:00
+        </div>
+      </div>
+
+      <div class="status">
+        • AI emotion engine initialized<br><br>
+        • Face tracking enabled<br><br>
+        • Real-time analysis active<br><br>
+        • Demo access mode enabled
+      </div>
+
+      <div class="warning" id="warningBox">
+        ⏰ Demo Time Expired!<br><br>
+        Please login to stay connected and continue emotion detection.
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+  let timeLeft = 60;
+  let timerRunning = true;
+
+  const timerEl = document.getElementById("timer");
+  const warningBox = document.getElementById("warningBox");
+
+  const timer = setInterval(() => {
+
+    if(!timerRunning) return;
+
+    let minutes = Math.floor(timeLeft / 60);
+    let seconds = timeLeft % 60;
+
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+    seconds = seconds < 10 ? "0" + seconds : seconds;
+
+    timerEl.innerHTML = `${minutes}:${seconds}`;
+
+    timeLeft--;
+
+    if(timeLeft < 0){
+      clearInterval(timer);
+
+      timerEl.innerHTML = "00:00";
+
+      warningBox.style.display = "block";
+
+      document.getElementById("cameraText").innerHTML =
+      "Demo expired — Login Required";
+
+    }
+
+  },1000);
+
+  function startCamera(){
+
+    document.getElementById("cameraText").innerHTML =
+    "🟢 Camera Started — Detecting Emotions...";
+
+  }
+
+  function stopCamera(){
+
+    document.getElementById("cameraText").innerHTML =
+    "🔴 Camera Stopped";
+
+  }
+
+</script>
+
+</body>
+</html>

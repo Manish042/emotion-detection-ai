@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<title>Face Emotion Detection</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+
+/* HERO */
+.fd-hero{
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:60px;
+background:linear-gradient(to right,#020617,#1e3a8a);
+color:white;
+}
+
+.fd-text{
+max-width:500px;
+}
+
+.fd-text h1{
+font-size:36px;
+margin-bottom:15px;
+}
+
+.fd-text p{
+opacity:0.8;
+margin-bottom:20px;
+}
+
+.fd-hero img{
+    margin-top:30px;
+width:400px;
+border-radius:10px;
+}
+
+/* BUTTON */
+.fd-btn{
+background:#2563eb;
+color:white;
+padding:10px 20px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+transition:0.3s;
+}
+
+.fd-btn:hover{
+background:#1d4ed8;
+transform:scale(1.05);
+}
+
+/* FEATURES */
+.fd-features{
+padding:60px;
+text-align:center;
+}
+
+.fd-container{
+display:flex;
+justify-content:center;
+gap:20px;
+flex-wrap:wrap;
+}
+
+.fd-card{
+background:#1e293b;
+padding:40px;
+border-radius:10px;
+width:250px;
+transition:0.3s;
+}
+
+.fd-card:hover{
+transform:translateY(-8px);
+box-shadow:0 10px 20px rgba(0,0,0,0.4);
+}
+
+/* STEPS */
+.fd-steps{
+padding:60px;
+background:#020617;
+text-align:center;
+}
+
+.fd-steps ul{
+list-style:none;
+max-width:600px;
+margin:auto;
+text-align:left;
+}
+
+.fd-steps li{
+margin:10px 0;
+background:#1e293b;
+padding:12px;
+border-radius:8px;
+}
+
+/* DEMO */
+.fd-demo{
+padding:60px;
+text-align:center;
+}
+
+body{
+background:#0f172a;
+font-family:'Poppins',sans-serif;
+color:white;
+margin:0;
+}
+
+.sidebar a,
+.sidebar-toggle{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px 24px;
+  color:white;
+  text-decoration:none;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.sidebar a:hover,
+.sidebar-toggle:hover{
+  background:#0f1f38;
+  color:#00e5ff;
+}
+
+.sidebar-dropdown{
+  max-height:0;
+  overflow:hidden;
+  transition:0.3s;
+  background:#0d1729;
+}
+
+.sidebar-dropdown.open{
+  max-height:300px;
+}
+
+.sidebar-dropdown a{
+  padding-left:40px;
+  font-size:14px;
+}
+
+.arrow{
+  font-size:12px;
+}
+
+
+
+</style>
+
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div id="sidebar" class="sidebar">
+  <button class="close-btn" onclick="closeMenu()">✕</button>
+
+  <a href="/">🏠 Home</a>
+
+  <div class="sidebar-toggle" id="productToggle" onclick="toggleSidebar('product')">
+    <span>📦 Product</span>
+    <span class="arrow">▼</span>
+  </div>
+
+  <div class="sidebar-dropdown open" id="productDropdown">
+    <a href="/face-detection">🧠 Face Detection</a>
+  </div>
+
+  <div class="sidebar-toggle" id="usecaseToggle" onclick="toggleSidebar('usecase')">
+    <span>💡 Use Case</span>
+    <span class="arrow">▼</span>
+  </div>
+
+  <div class="sidebar-dropdown" id="usecaseDropdown">
+    <a href="/education">🎓 Education</a>
+    <a href="/security">🔒 Security</a>
+    <a href="/healthcare">🏥 Healthcare</a>
+  </div>
+
+  <a href="/history">📜 History</a>
+  <a href="/contact">📞 Contact Us</a>
+  <a href="/terms">📄 Terms & Conditions</a>
+</div>
+
+
+
+<!-- HEADER -->
+<header>
+
+<div class="left-section">
+<div class="menu-toggle" onclick="openMenu()">☰</div>
+<div class="logo">EmotionAI</div>
+</div>
+
+<nav class="top-nav">
+<a href="/">Home</a>
+
+<div class="dropdown">
+<a href="#">Product ▾</a>
+<div class="dropdown-menu">
+<a href="/face-detection">Face Detection</a>
+</div>
+</div>
+
+<a href="#">Use Case</a>
+<a href="#">API</a>
+<a href="/login" class="login-btn">Login</a>
+</nav>
+
+</header>
+
+<!-- HERO -->
+<section class="fd-hero">
+
+<div class="fd-text">
+<h1>Face Emotion Detection</h1>
+<p>Analyze human emotions in real-time using AI.</p>
+
+<a href="/camera">
+<button class="fd-btn">Start Live Detection</button>
+</a>
+</div>
+
+<img src="https://images.unsplash.com/photo-1607746882042-944635dfe10e">
+
+</section>
+
+<!-- FEATURES -->
+<section class="fd-features">
+
+<h2>Key Features</h2>
+
+<div class="fd-container">
+
+<div class="fd-card">
+<h3>Real-Time Detection</h3>
+<p>Detect emotions instantly using webcam.</p>
+</div>
+
+<div class="fd-card">
+<h3>Multiple Emotions</h3>
+<p>Recognizes happy, sad, angry, etc.</p>
+</div>
+
+<div class="fd-card">
+<h3>High Accuracy</h3>
+<p>Powered by deep learning model.</p>
+</div>
+
+</div>
+
+</section>
+
+<!-- DEMO -->
+<section class="fd-demo">
+
+<h2>Live Demo</h2>
+
+<img id="video" width="600">
+
+<br><br>
+
+<button onclick="startCamera()" class="fd-btn">Start Camera</button>
+<button onclick="stopCamera()" class="fd-btn">Stop Camera</button>
+
+<script>
+function startCamera(){
+    document.getElementById("video").src="/video";
+}
+
+function stopCamera(){
+    document.getElementById("video").src="";
+}
+</script>
+
+
+
+</section>
+
+<script>
+function openMenu() {
+  document.getElementById("sidebar").classList.add("active");
+}
+
+function closeMenu() {
+  document.getElementById("sidebar").classList.remove("active");
+}
+
+function toggleSidebar(name) {
+  const dropdown = document.getElementById(name + "Dropdown");
+  const toggle = document.getElementById(name + "Toggle");
+
+  dropdown.classList.toggle("open");
+  toggle.classList.toggle("open");
+}
+</script>
+
+</body>
+</html>

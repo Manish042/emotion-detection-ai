@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms & Conditions</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/terms.css') }}">
+
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="left-section">
+    <div class="menu-toggle" onclick="openMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+
+    <div class="logo">Emotion Detection</div>
+  </div>
+
+  <nav class="top-nav">
+    <a href="/">Home</a>
+
+    <div class="dropdown">
+      <a href="#">Product ▾</a>
+      <div class="dropdown-menu">
+        <a href="/face-detection">🧠 Face Detection</a>
+      </div>
+    </div>
+
+    <div class="dropdown">
+      <a href="#">Use Case ▾</a>
+      <div class="dropdown-menu">
+        <a href="/education">🎓 Education</a>
+        <a href="/healthcare">🏥 Healthcare</a>
+        <a href="/security">🔒 Security</a>
+      </div>
+    </div>
+
+    <div class="dropdown">
+      <a href="#">API ▾</a>
+      <div class="dropdown-menu">
+        <a href="/documentation">📄 Documentation</a>
+      </div>
+    </div>
+
+    <a href="/login" class="login-btn">Login</a>
+  </nav>
+</header>
+
+<!-- SIDEBAR -->
+<div id="sidebar" class="sidebar">
+
+  <button class="close-btn" onclick="closeMenu()">✕</button>
+
+  <a href="/">🏠 Home</a>
+
+  <div class="sidebar-toggle" id="productToggle" onclick="toggleSidebar('product')">
+    <span>📦 Product</span>
+    <span class="arrow">▼</span>
+  </div>
+
+  <div class="sidebar-dropdown" id="productDropdown">
+    <a href="/face-detection">🧠 Face Detection</a>
+  </div>
+
+  <div class="sidebar-toggle" id="usecaseToggle" onclick="toggleSidebar('usecase')">
+    <span>💡 Use Case</span>
+    <span class="arrow">▼</span>
+  </div>
+
+  <div class="sidebar-dropdown" id="usecaseDropdown">
+    <a href="/education">🎓 Education</a>
+    <a href="/security">🔒 Security</a>
+    <a href="/healthcare">🏥 Healthcare</a>
+  </div>
+
+  <a href="/documentation">⚙️ API</a>
+  <a href="/history">📜 History</a>
+  <a href="/contact">📞 Contact Us</a>
+  <a href="/terms">📄 Terms & Conditions</a>
+
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+
+    <div class="badge">📄 LEGAL</div>
+
+    <h1>Terms & Conditions</h1>
+
+    <p>
+      Please read these terms carefully before using our platform.
+    </p>
+
+  </div>
+</section>
+
+<!-- TERMS -->
+<section class="terms-section">
+
+  <div class="terms-card">
+
+    <h2>1. Usage Policy</h2>
+    <p>
+      Users must use this platform responsibly and legally.
+      Any misuse or illegal activity is strictly prohibited.
+    </p>
+
+    <h2>2. Privacy</h2>
+    <p>
+      Uploaded images are processed securely and protected.
+    </p>
+
+    <h2>3. AI Accuracy</h2>
+    <p>
+      Emotion detection results are AI-generated predictions and may vary.
+    </p>
+
+    <h2>4. Payments</h2>
+    <p>
+      Payments made through Razorpay are secure and non-refundable.
+    </p>
+
+    <h2>5. User Responsibility</h2>
+
+    <ul>
+      <li>Keep your account secure.</li>
+      <li>Do not share passwords.</li>
+      <li>You are responsible for account activity.</li>
+    </ul>
+
+    <h2>6. Updates</h2>
+    <p>
+      We may update these terms at any time without notice.
+    </p>
+
+    <h2>7. Contact</h2>
+    <p>
+      Contact us through the Contact page for any queries.
+    </p>
+
+    <a href="/" class="back-btn">← Back to Home</a>
+
+  </div>
+
+</section>
+
+<script>
+
+function openMenu(){
+  document.getElementById('sidebar').classList.add('active');
+}
+
+function closeMenu(){
+  document.getElementById('sidebar').classList.remove('active');
+}
+
+function toggleSidebar(name){
+
+  const dropdown = document.getElementById(name + 'Dropdown');
+  const toggle = document.getElementById(name + 'Toggle');
+
+  dropdown.classList.toggle('open');
+  toggle.classList.toggle('open');
+}
+
+</script>
+
+</body>
+</html>

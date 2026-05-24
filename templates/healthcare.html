@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Healthcare Use Case</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/healthcare.css') }}">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+</head>
+
+<body class="edu-body">
+
+<!-- NAVBAR -->
+<header class="edu-header">
+
+<div class="logo">EmotionAI</div>
+
+<nav class="edu-nav">
+<a href="/">Home</a>
+<a href="/education">Education</a>
+<a href="/healthcare">Healthcare</a>
+<a href="/login">Login</a>
+</nav>
+
+</header>
+
+<h1 class="edu-heading">Healthcare Use Case</h1>
+
+<!-- INTRO -->
+<div class="edu-intro">
+
+<p>
+Face emotion detection in healthcare helps doctors understand patient emotions,
+pain levels, and mental health conditions more effectively.
+</p>
+
+<p>
+It enables better diagnosis and improves patient care by analyzing facial
+expressions in real-time.
+</p>
+
+</div>
+
+<!-- CONTENT SECTION -->
+<div class="eng-container">
+
+<div class="eng-text">
+
+<p>
+Emotion AI can detect stress, anxiety, depression, and discomfort in patients,
+even when they are unable to communicate clearly.
+</p>
+
+<p>
+It is highly useful in monitoring ICU patients, elderly care, and mental health treatment.
+</p>
+
+<p>
+Doctors can use emotion insights to provide personalized treatment and improve
+overall healthcare outcomes.
+</p>
+</div>
+<div class="health-img">
+<img src="{{ url_for('static', filename='images/health.png') }}"
+     style="width:100%;border-radius:15px;">
+</div>
+
+<br><br>
+
+<div class="back-btn">
+<a href="/">⬅ Back to Home</a>
+</div>
+
+</body>
+</html>

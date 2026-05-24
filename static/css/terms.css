@@ -1,0 +1,278 @@
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+:root{
+  --bg:#04070f;
+  --card:#0b1120;
+  --accent:#00e5ff;
+  --purple:#7c3aed;
+  --text:#e2eaff;
+  --muted:#7b8bab;
+  --border:rgba(0,229,255,0.12);
+
+  --font-head:'Syne',sans-serif;
+  --font-body:'DM Sans',sans-serif;
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  overflow-x:hidden;
+}
+
+/* HEADER */
+
+header{
+  position:sticky;
+  top:0;
+  z-index:100;
+  height:82px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 50px;
+  background:#030817;
+  border-bottom:1px solid var(--border);
+}
+
+.left-section{
+  display:flex;
+  align-items:center;
+  gap:20px;
+}
+
+.logo{
+  font-size:1.1rem;
+  font-family:var(--font-head);
+  font-weight:800;
+  color:var(--accent);
+}
+
+.menu-toggle{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  cursor:pointer;
+}
+
+.menu-toggle span{
+  width:22px;
+  height:2px;
+  background:var(--accent);
+}
+
+.top-nav{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.top-nav a{
+  color:#8b97b8;
+  text-decoration:none;
+  padding:10px 16px;
+  border-radius:8px;
+  font-size:0.92rem;
+  font-weight:600;
+  transition:0.3s;
+}
+
+.top-nav a:hover{
+  color:white;
+}
+
+.login-btn{
+  background:linear-gradient(135deg,#00e5ff,#0077ff);
+  color:#04111f !important;
+  font-weight:700 !important;
+  padding:12px 24px !important;
+}
+
+/* DROPDOWN */
+
+.dropdown{
+  position:relative;
+}
+
+.dropdown-menu{
+  display:none;
+  position:absolute;
+  top:100%;
+  left:0;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  min-width:180px;
+  padding:10px;
+}
+
+.dropdown:hover .dropdown-menu{
+  display:block;
+}
+
+.dropdown-menu a{
+  display:block;
+  padding:10px;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+  position:fixed;
+  top:0;
+  left:-300px;
+  width:280px;
+  height:100%;
+  background:var(--card);
+  border-right:1px solid var(--border);
+  transition:0.35s;
+  z-index:999;
+  padding-top:30px;
+}
+
+.sidebar.active{
+  left:0;
+}
+
+.close-btn{
+  background:none;
+  border:none;
+  color:white;
+  font-size:1.2rem;
+  margin-left:220px;
+  cursor:pointer;
+}
+
+.sidebar a,
+.sidebar-toggle{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px 25px;
+  color:#9eb0d3;
+  text-decoration:none;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.sidebar a:hover,
+.sidebar-toggle:hover{
+  background:rgba(0,229,255,0.08);
+  color:var(--accent);
+}
+
+.sidebar-dropdown{
+  max-height:0;
+  overflow:hidden;
+  transition:0.3s;
+}
+
+.sidebar-dropdown.open{
+  max-height:300px;
+}
+
+.sidebar-dropdown a{
+  padding-left:40px;
+}
+
+/* HERO */
+
+.hero{
+  padding:100px 20px 70px;
+  text-align:center;
+  border-bottom:1px solid var(--border);
+}
+
+.badge{
+  display:inline-block;
+  padding:10px 24px;
+  border-radius:100px;
+  border:1px solid rgba(0,229,255,0.2);
+  background:rgba(0,229,255,0.08);
+  color:var(--accent);
+  font-size:0.8rem;
+  font-weight:700;
+  letter-spacing:2px;
+  margin-bottom:25px;
+}
+
+.hero h1{
+  font-family:var(--font-head);
+  font-size:4rem;
+  font-weight:800;
+  margin-bottom:20px;
+}
+
+.hero p{
+  color:#95a6c8;
+  font-size:1.1rem;
+}
+
+/* TERMS */
+
+.terms-section{
+  padding:70px 20px;
+}
+
+.terms-card{
+  max-width:1000px;
+  margin:auto;
+  background:#07101f;
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:50px;
+}
+
+.terms-card h2{
+  color:var(--accent);
+  margin-top:35px;
+  margin-bottom:12px;
+  font-size:1.3rem;
+}
+
+.terms-card p,
+.terms-card li{
+  color:#b8c4df;
+  line-height:1.9;
+}
+
+.terms-card ul{
+  margin-left:20px;
+}
+
+.back-btn{
+  display:inline-block;
+  margin-top:40px;
+  padding:14px 28px;
+  background:linear-gradient(135deg,#00e5ff,#0077ff);
+  color:#04111f;
+  border-radius:12px;
+  text-decoration:none;
+  font-weight:700;
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+  header{
+    padding:0 20px;
+  }
+
+  .top-nav{
+    display:none;
+  }
+
+  .hero h1{
+    font-size:2.5rem;
+  }
+
+  .terms-card{
+    padding:30px;
+  }
+
+}
