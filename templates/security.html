@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <meta charset="UTF-8">
+  <title>Security - Emotion Detection</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/security.css') }}">
+
+</head>
+
+<body>
+
+<div id="loader-bar"></div>
+
+<!-- ══ HEADER ══ -->
+<header>
+  <div class="left-section">
+    <div class="menu-toggle" onclick="openMenu()">☰</div>
+    <div class="logo">Emotion Detection</div>
+  </div>
+
+  <nav class="top-nav">
+    <a href="/">Home</a>
+
+    <div class="dropdown">
+      <a href="#">Product ▾</a>
+      <div class="dropdown-menu">
+        <a href="/face-detection">Face Detection</a>
+      </div>
+    </div>
+
+    <div class="dropdown">
+      <a href="#">Use Case ▾</a>
+      <div class="dropdown-menu">
+        <a href="/education">Education</a>
+        <a href="/healthcare">Healthcare</a>
+        <a href="/security">Security</a>
+      </div>
+    </div>
+
+    <div class="dropdown">
+      <a href="#">API ▾</a>
+      <div class="dropdown-menu">
+        <a href="/documentation">Documentation</a>
+      </div>
+    </div>
+
+    <a href="/login" class="login-btn">Login</a>
+  </nav>
+</header>
+
+<!-- ══ SIDEBAR ══ -->
+<div id="sidebar" class="sidebar">
+  <span class="close-btn" onclick="closeMenu()">✖</span>
+
+  <a href="/">🏠 Home</a>
+
+  <div class="sidebar-toggle" id="productToggle" onclick="toggleSidebar('product')">
+    <span>📦 Product</span>
+    <span class="arrow" id="productArrow">▼</span>
+  </div>
+  <div class="sidebar-dropdown" id="productDropdown">
+    <a href="/face-detection">🧠 Face Detection</a>
+  </div>
+
+  <div class="sidebar-toggle" id="usecaseToggle" onclick="toggleSidebar('usecase')">
+    <span>💡 Use Case</span>
+    <span class="arrow" id="usecaseArrow">▼</span>
+  </div>
+  <div class="sidebar-dropdown" id="usecaseDropdown">
+    <a href="/education">🎓 Education</a>
+    <a href="/security">🔒 Security</a>
+    <a href="/healthcare">🏥 Healthcare</a>
+  </div>
+
+  <a href="#">⚙️ API</a>
+  <a href="/history">📜 History</a>
+  <a href="#">📞 Contact Us</a>
+  <a href="#">📄 Terms &amp; Conditions</a>
+</div>
+
+<!-- ══ HERO ══ -->
+<section class="sec-hero">
+  <div class="sec-hero-text">
+    <div class="tag">🔒 Use Case — Security</div>
+    <h1>AI-Powered <span>Security</span><br>&amp; Surveillance</h1>
+    <p>
+      Harness real-time facial emotion detection to strengthen physical and
+      digital security. Identify suspicious behaviour, detect stress or
+      aggression, and respond before incidents escalate.
+    </p>
+    <div class="btn-group">
+      <a href="/login" class="btn primary">Get Started</a>
+      <a href="/documentation" class="btn secondary">View API Docs</a>
+    </div>
+  </div>
+  <img
+    class="sec-hero-img"
+    src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&auto=format&fit=crop"
+    alt="Security Surveillance"
+  >
+</section>
+
+<!-- ══ STATS ══ -->
+<div class="stats-row">
+  <div class="stat-item">
+    <h2>99.3%</h2>
+    <p>Detection Accuracy</p>
+  </div>
+  <div class="stat-item">
+    <h2>&lt; 80ms</h2>
+    <p>Real-time Response</p>
+  </div>
+  <div class="stat-item">
+    <h2>500+</h2>
+    <p>Security Deployments</p>
+  </div>
+  <div class="stat-item">
+    <h2>24 / 7</h2>
+    <p>Continuous Monitoring</p>
+  </div>
+</div>
+
+<!-- ══ FEATURE CARDS ══ -->
+<div class="section-title">
+  <h2>What We <span>Detect</span></h2>
+  <p>Core capabilities powering next-generation security systems</p>
+</div>
+
+<div class="cards-grid">
+  <div class="card">
+    <div class="card-icon">😠</div>
+    <h3>Aggression Detection</h3>
+    <p>Identify anger or hostile emotions in real-time crowd footage and trigger instant alerts for security teams.</p>
+  </div>
+  <div class="card">
+    <div class="card-icon">😰</div>
+    <h3>Stress &amp; Fear Analysis</h3>
+    <p>Detect elevated stress or fear levels that may indicate a person is under duress or being coerced.</p>
+  </div>
+  <div class="card">
+    <div class="card-icon">👁️</div>
+    <h3>Face Recognition</h3>
+    <p>Match faces against watchlists or authorised personnel databases for access control and threat identification.</p>
+  </div>
+  <div class="card">
+    <div class="card-icon">🎥</div>
+    <h3>CCTV Integration</h3>
+    <p>Plug directly into existing CCTV infrastructure — no hardware replacement needed. Works with IP cameras.</p>
+  </div>
+  <div class="card">
+    <div class="card-icon">🚨</div>
+    <h3>Instant Alerts</h3>
+    <p>Push real-time notifications to security dashboards, mobile apps, or control rooms the moment a threat is flagged.</p>
+  </div>
+  <div class="card">
+    <div class="card-icon">📊</div>
+    <h3>Incident Analytics</h3>
+    <p>Review heatmaps, emotion timelines, and incident reports to improve response strategies over time.</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══ USE CASE 1 ══ -->
+<div class="use-section">
+  <img
+    src="https://images.unsplash.com/photo-1573164713988-8665fc963095?w=900&auto=format&fit=crop"
+    alt="Airport Security"
+  >
+  <div class="use-text">
+    <h3>Airport &amp; Border <span>Control</span></h3>
+    <p>
+      Airports handle millions of passengers daily. EmotionAI scans faces
+      in real-time to flag unusual emotional patterns — helping agents focus
+      attention where it matters most.
+    </p>
+    <ul>
+      <li>Passive scanning without passenger interruption</li>
+      <li>Integration with existing biometric gates</li>
+      <li>Multi-face tracking in crowded terminals</li>
+      <li>GDPR-compliant data handling</li>
+    </ul>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══ USE CASE 2 ══ -->
+<div class="use-section reverse">
+  <img
+    src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=900&auto=format&fit=crop"
+    alt="Corporate Security"
+  >
+  <div class="use-text">
+    <h3>Corporate &amp; Campus <span>Security</span></h3>
+    <p>
+      Protect offices, data centres, and university campuses with intelligent
+      access control powered by facial emotion analysis. Only calm, authorised
+      individuals pass through — automatically.
+    </p>
+    <ul>
+      <li>Tailgating and unauthorised access prevention</li>
+      <li>Emotion-aware entry gates</li>
+      <li>Visitor management with live monitoring</li>
+      <li>24/7 unattended operation</li>
+    </ul>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══ USE CASE 3 ══ -->
+<div class="use-section">
+  <img
+    src="https://images.unsplash.com/photo-1525130413817-d45c1d127c42?w=900&auto=format&fit=crop"
+    alt="Public Safety"
+  >
+  <div class="use-text">
+    <h3>Public Safety &amp; <span>Crowd Management</span></h3>
+    <p>
+      Large events — concerts, rallies, stadiums — are challenging to monitor
+      manually. EmotionAI provides a live emotional pulse of the crowd,
+      helping prevent stampedes and disturbances before they start.
+    </p>
+    <ul>
+      <li>Crowd density + emotion overlay on maps</li>
+      <li>Early panic or unrest detection</li>
+      <li>Automatic zone-based alert escalation</li>
+      <li>Post-event incident review reports</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══ HELP BUTTON ══ -->
+<div class="help-btn" onclick="openHelp()">💬</div>
+
+<!-- ══ POPUP ══ -->
+<div class="help-popup" id="popup">
+  <div class="help-card">
+    <span class="close-btn" onclick="closeHelp()">✖</span>
+    <h3>Your assistance is here</h3>
+    <input type="text"  placeholder="Enter Name">
+    <input type="email" placeholder="Enter Email">
+    <button>Submit</button>
+  </div>
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  &copy; 2025 Emotion Detection. All rights reserved.
+</footer>
+
+<!-- ══ JS ══ -->
+<script>
+  function openMenu()  { document.getElementById("sidebar").classList.add("active"); }
+  function closeMenu() { document.getElementById("sidebar").classList.remove("active"); }
+  function openHelp()  { document.getElementById("popup").style.display = "flex"; }
+  function closeHelp() { document.getElementById("popup").style.display = "none"; }
+
+  function toggleSidebar(section) {
+    const dropdown = document.getElementById(section + 'Dropdown');
+    const toggle   = document.getElementById(section + 'Toggle');
+    const isOpen   = dropdown.classList.contains('open');
+    dropdown.classList.toggle('open', !isOpen);
+    toggle.classList.toggle('open', !isOpen);
+  }
+
+  document.querySelectorAll("a").forEach(link => {
+    link.addEventListener("click", function() {
+      let bar = document.getElementById("loader-bar");
+      bar.style.opacity = "1";
+      bar.style.width   = "100%";
+    });
+  });
+
+  window.onload = function() {
+    let bar = document.getElementById("loader-bar");
+    bar.style.width = "100%";
+    setTimeout(() => {
+      bar.style.opacity = "0";
+      bar.style.width   = "0%";
+    }, 400);
+  };
+</script>
+
+</body>
+</html>

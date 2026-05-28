@@ -1,0 +1,116 @@
+/* ===== HEALTHCARE PAGE ===== */
+
+body{
+background:linear-gradient(to right,#020617,#0f172a);
+color:white;
+font-family:'Poppins', sans-serif;
+margin:0;
+padding:0;
+}
+
+/* ===== NAVBAR ===== */
+.edu-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px 40px;
+background:#020617;
+position:sticky;
+top:0;
+z-index:1000;
+}
+
+.logo{
+font-size:22px;
+font-weight:700;
+color:#38bdf8;
+}
+
+.edu-nav a{
+color:white;
+margin-left:25px;
+text-decoration:none;
+transition:0.3s;
+}
+
+.edu-nav a:hover{
+color:#38bdf8;
+}
+
+/* ===== HEADING ===== */
+.health-heading{
+text-align:center;
+font-size:36px;
+margin:40px 0 20px;
+}
+
+/* ===== INTRO ===== */
+.health-intro{
+max-width:800px;
+margin:auto;
+text-align:center;
+line-height:1.8;
+opacity:0.9;
+padding:0 20px;
+}
+
+/* ===== MAIN CONTENT ===== */
+.health-container{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:40px;
+padding:40px;
+flex-wrap:wrap;
+}
+
+.health-text{
+flex:1;
+font-size:16px;
+font-weight:500;
+line-height:1.8;
+}
+
+.health-img{
+flex:1;
+text-align:right;
+}
+
+.health-img img{
+width:100%;
+max-width:450px;
+border-radius:20px;
+box-shadow:0 10px 25px rgba(0,0,0,0.5);
+transition:0.3s;
+}
+
+.health-img img:hover{
+transform:scale(1.05);
+}
+
+/* ===== BACK BUTTON ===== */
+.back-btn{
+text-align:center;
+margin:40px 0;
+}
+
+.back-btn a{
+color:#38bdf8;
+text-decoration:none;
+}
+
+.back-btn a:hover{
+text-decoration:underline;
+}
+
+/* ===== MOBILE ===== */
+@media(max-width:768px){
+.health-container{
+flex-direction:column;
+text-align:center;
+}
+
+.health-img{
+text-align:center;
+}
+}

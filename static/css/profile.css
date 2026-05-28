@@ -1,0 +1,224 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#020617;
+    font-family:'Rajdhani',sans-serif;
+    color:white;
+    min-height:100vh;
+}
+
+/* ================= NAVBAR ================= */
+
+.navbar{
+    width:100%;
+    height:60px;
+    background:#0f172a;
+    border-bottom:1px solid #1e293b;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 30px;
+}
+
+.logo{
+    color:#60a5fa;
+    font-size:22px;
+    font-family:'Orbitron',sans-serif;
+    font-weight:700;
+    letter-spacing:2px;
+}
+
+.home-btn{
+    background:#3b82f6;
+    color:white;
+    text-decoration:none;
+    padding:8px 16px;
+    border-radius:8px;
+    font-size:14px;
+    font-weight:700;
+    transition:.3s;
+}
+
+.home-btn:hover{
+    background:#2563eb;
+}
+
+/* ================= MAIN ================= */
+
+.container{
+    width:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:40px 20px;
+}
+
+/* ================= CARD ================= */
+
+.card{
+    width:520px;
+    background:#111827;
+    border:1px solid #1e293b;
+    border-radius:22px;
+    padding:40px;
+    box-shadow:0 0 40px rgba(0,0,0,.45);
+}
+
+.title{
+    text-align:center;
+    font-size:42px;
+    margin-bottom:35px;
+    color:white;
+    font-weight:700;
+}
+
+/* ================= PROFILE ================= */
+
+.profile-box{
+    text-align:center;
+    margin-bottom:30px;
+}
+
+.profile-img{
+    width:120px;
+    height:120px;
+    border-radius:50%;
+    object-fit:cover;
+    border:4px solid #3b82f6;
+}
+
+.upload-btn{
+    display:inline-block;
+    margin-top:18px;
+    background:#2563eb;
+    padding:12px 20px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:700;
+    transition:.3s;
+    font-size:15px;
+}
+
+.upload-btn:hover{
+    background:#3b82f6;
+}
+
+input[type="file"]{
+    display:none;
+}
+
+/* ================= FORM ================= */
+
+.form-group{
+    margin-bottom:22px;
+}
+
+label{
+    display:block;
+    margin-bottom:8px;
+    font-size:18px;
+    color:#cbd5e1;
+}
+
+.input-box{
+    position:relative;
+}
+
+input{
+    width:100%;
+    height:56px;
+    background:#1e293b;
+    border:none;
+    outline:none;
+    border-radius:12px;
+    padding:0 18px;
+    color:white;
+    font-size:17px;
+}
+
+input:focus{
+    border:1px solid #3b82f6;
+}
+
+/* ================= EYE ================= */
+
+.eye{
+    position:absolute;
+    right:18px;
+    top:50%;
+    transform:translateY(-50%);
+    cursor:pointer;
+    font-size:20px;
+    user-select:none;
+}
+
+/* ================= BUTTONS ================= */
+
+.save-btn{
+    width:100%;
+    height:56px;
+    border:none;
+    border-radius:12px;
+    background:#60a5fa;
+    color:black;
+    font-size:20px;
+    font-weight:700;
+    cursor:pointer;
+    margin-top:10px;
+    transition:.3s;
+}
+
+.save-btn:hover{
+    background:#3b82f6;
+    color:white;
+}
+
+.login-btn{
+    width:100%;
+    display:block;
+    text-align:center;
+    margin-top:18px;
+    padding:14px;
+    border-radius:12px;
+    text-decoration:none;
+    border:1px solid #ef4444;
+    color:#ef4444;
+    font-weight:700;
+    transition:.3s;
+}
+
+.login-btn:hover{
+    background:#ef4444;
+    color:white;
+}
+
+/* ================= MOBILE ================= */
+
+@media(max-width:700px){
+
+    .card{
+        width:100%;
+        padding:28px;
+    }
+
+    .title{
+        font-size:32px;
+    }
+
+    .navbar{
+        padding:0 15px;
+    }
+
+    .logo{
+        font-size:18px;
+    }
+
+    .home-btn{
+        font-size:12px;
+        padding:7px 12px;
+    }
+}

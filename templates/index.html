@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emotion Detection — AI Powered</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg:#04070f; --bg2:#080d1a; --card:#0b1120;
+  --accent:#00e5ff; --purple:#7c3aed; --pink:#ec4899; --green:#00ffa3;
+  --text:#e2eaff; --muted:#5a6a8a; --border:rgba(0,229,255,0.1); --glow:rgba(0,229,255,0.12);
+  --font-head:'Syne',sans-serif; --font-body:'DM Sans',sans-serif;
+}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text);overflow-x:hidden;}
+
+
+
+/* CANVAS */
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;}
+
+/* LOADER */
+#loader-bar{position:fixed;top:0;left:0;height:2px;width:0%;background:linear-gradient(90deg,var(--purple),var(--accent),var(--green));z-index:9999;transition:width 0.4s ease,opacity 0.4s;opacity:0;box-shadow:0 0 12px var(--accent);}
+
+/* HEADER */
+header{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:68px;background:rgba(4,7,15,0.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.left-section{display:flex;align-items:center;gap:20px;}
+.menu-toggle{display:flex;flex-direction:column;gap:5px;cursor:pointer;padding:4px;}
+.menu-toggle span{display:block;width:22px;height:2px;background:var(--accent);border-radius:2px;transition:all 0.3s;}
+.logo{font-family:var(--font-head);font-size:1.22rem;font-weight:800;letter-spacing:-0.5px;background:linear-gradient(90deg,var(--accent),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.top-nav{display:flex;align-items:center;gap:6px;}
+.top-nav>a,.top-nav>div>a{color:var(--muted);text-decoration:none;font-size:0.88rem;font-weight:500;padding:8px 14px;border-radius:8px;transition:all 0.2s;}
+.top-nav>a:hover{color:var(--text);background:rgba(255,255,255,0.05);}
+.dropdown{position:relative;}
+.dropdown>a{color:var(--muted);}
+.dropdown>a:hover{color:var(--text);background:rgba(255,255,255,0.05);}
+.dropdown-menu{display:none;position:absolute;top:calc(100% + 8px);left:0;background:var(--card);border:1px solid var(--border);border-radius:12px;min-width:170px;padding:8px;box-shadow:0 20px 60px rgba(0,0,0,0.6);animation:fadeDown 0.2s ease;}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.dropdown:hover .dropdown-menu{display:block;}
+.dropdown-menu a{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;font-size:0.85rem;color:var(--muted);text-decoration:none;transition:all 0.2s;}
+.dropdown-menu a:hover{color:var(--accent);background:var(--glow);}
+.login-btn{background:linear-gradient(135deg,var(--accent),#0077ff)!important;color:#04070f!important;padding:9px 24px!important;border-radius:10px!important;font-weight:700!important;font-size:0.88rem!important;letter-spacing:0.3px;transition:box-shadow 0.25s,transform 0.2s!important;text-decoration:none;}
+.login-btn:hover{box-shadow:0 0 28px rgba(0,229,255,0.5)!important;transform:translateY(-1px)!important;}
+
+/* SIDEBAR */
+.sidebar{position:fixed;top:0;left:-300px;width:280px;height:100%;background:var(--card);border-right:1px solid var(--border);z-index:500;transition:left 0.38s cubic-bezier(0.4,0,0.2,1);padding:30px 0;display:flex;flex-direction:column;box-shadow:8px 0 40px rgba(0,0,0,0.6);}
+.sidebar.active{left:0;}
+.sidebar .close-btn{align-self:flex-end;margin-right:22px;margin-bottom:16px;width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+.sidebar .close-btn:hover{color:var(--accent);border-color:var(--accent);}
+.sidebar a{display:flex;align-items:center;padding:12px 24px;color:var(--muted);text-decoration:none;font-size:0.92rem;border-left:2px solid transparent;transition:all 0.22s;}
+.sidebar a:hover{color:var(--accent);border-left-color:var(--accent);background:var(--glow);}
+.sidebar-dropdown{overflow:hidden;max-height:0;opacity:0;transition:max-height 0.35s ease,opacity 0.3s ease;background:rgba(0,229,255,0.03);border-left:2px solid var(--accent);}
+.sidebar-dropdown.open{max-height:300px;opacity:1;}
+.sidebar-dropdown a{padding:10px 20px 10px 36px!important;font-size:0.84rem!important;border-left:none!important;}
+.sidebar-toggle{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;cursor:pointer;color:var(--muted);font-size:0.92rem;border-left:2px solid transparent;transition:all 0.22s;user-select:none;}
+.sidebar-toggle:hover{color:var(--accent);border-left-color:var(--accent);background:var(--glow);}
+.sidebar-toggle .arrow{font-size:0.6rem;transition:transform 0.3s;}
+.sidebar-toggle.open .arrow{transform:rotate(180deg);color:var(--accent);}
+
+/* HERO */
+.hero{position:relative;z-index:1;min-height:calc(100vh - 68px);display:flex;align-items:center;justify-content:space-between;padding:60px 80px;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-200px;left:-200px;width:700px;height:700px;background:radial-gradient(circle,rgba(124,58,237,0.18) 0%,transparent 65%);pointer-events:none;}
+.hero::after{content:'';position:absolute;bottom:-150px;right:100px;width:500px;height:500px;background:radial-gradient(circle,rgba(0,229,255,0.1) 0%,transparent 65%);pointer-events:none;}
+.hero-text{max-width:560px;position:relative;z-index:2;}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,229,255,0.07);border:1px solid rgba(0,229,255,0.22);border-radius:100px;padding:6px 16px;font-size:0.72rem;font-weight:600;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:28px;animation:fadeUp 0.8s ease both;}
+.hero-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+.hero-text h1{font-family:var(--font-head);font-size:clamp(2.8rem,5vw,4.4rem);font-weight:800;line-height:1.06;letter-spacing:-2.5px;margin-bottom:22px;animation:fadeUp 0.8s 0.1s ease both;}
+.hero-text h1 .line1{display:block;color:var(--text);}
+.hero-text h1 .line2{display:block;background:linear-gradient(90deg,var(--accent),var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:200%;animation:gradShift 4s ease infinite,fadeUp 0.8s 0.15s ease both;}
+@keyframes gradShift{0%,100%{background-position:0%}50%{background-position:100%}}
+.hero-text h1 .line3{display:block;color:var(--text);}
+.hero-text p{font-size:1rem;color:var(--muted);line-height:1.78;margin-bottom:36px;animation:fadeUp 0.8s 0.2s ease both;}
+.hero-btns{display:flex;gap:14px;animation:fadeUp 0.8s 0.3s ease both;}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:14px 30px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#0077ff);color:#04070f;font-family:var(--font-body);font-weight:700;font-size:0.94rem;border:none;cursor:pointer;text-decoration:none;transition:all 0.25s;letter-spacing:0.3px;}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,229,255,0.45);}
+.btn-secondary{display:inline-flex;align-items:center;gap:8px;padding:14px 30px;border-radius:12px;background:transparent;border:1.5px solid rgba(0,229,255,0.28);color:var(--accent);font-family:var(--font-body);font-weight:600;font-size:0.94rem;cursor:pointer;text-decoration:none;transition:all 0.25s;}
+.btn-secondary:hover{background:var(--glow);border-color:var(--accent);transform:translateY(-2px);}
+.hero-visual{position:relative;z-index:2;animation:fadeUp 0.8s 0.2s ease both;}
+.hero-img-wrap{position:relative;width:420px;height:480px;}
+.hero-img-wrap::before{content:'';position:absolute;inset:-2px;border-radius:28px;background:linear-gradient(135deg,var(--accent),var(--purple),var(--pink));z-index:-1;animation:rotateBorder 6s linear infinite;}
+@keyframes rotateBorder{from{filter:hue-rotate(0deg)}to{filter:hue-rotate(360deg)}}
+.hero-img-wrap img{width:100%;height:100%;object-fit:cover;border-radius:26px;display:block;position:relative;z-index:1;}
+.emotion-tag{position:absolute;z-index:3;background:rgba(4,7,15,0.88);border:1px solid var(--border);backdrop-filter:blur(10px);border-radius:100px;padding:8px 16px;font-size:0.78rem;font-weight:600;display:flex;align-items:center;gap:6px;box-shadow:0 8px 32px rgba(0,0,0,0.4);animation:float 3s ease-in-out infinite;}
+.emotion-tag.e1{top:30px;left:-80px;animation-delay:0s;color:var(--green);border-color:rgba(0,255,163,0.25);}
+.emotion-tag.e2{top:50%;right:-90px;animation-delay:0.8s;color:var(--accent);border-color:rgba(0,229,255,0.25);}
+.emotion-tag.e3{bottom:60px;left:-70px;animation-delay:1.6s;color:var(--pink);border-color:rgba(236,72,153,0.25);}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.conf-bar{width:38px;height:3px;border-radius:2px;background:rgba(255,255,255,0.1);overflow:hidden;}
+.conf-fill{height:100%;border-radius:2px;}
+.e1 .conf-fill{background:var(--green);width:82%;}
+.e2 .conf-fill{background:var(--accent);width:74%;}
+.e3 .conf-fill{background:var(--pink);width:91%;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+
+/* MARQUEE */
+.marquee-wrap{position:relative;z-index:1;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg2);overflow:hidden;padding:14px 0;}
+.marquee-track{display:flex;animation:marquee 22s linear infinite;white-space:nowrap;}
+.marquee-item{display:inline-flex;align-items:center;gap:10px;padding:0 32px;font-size:0.78rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);}
+.marquee-item .mdot{color:var(--accent);}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* STATS */
+.stats-row{position:relative;z-index:1;display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);}
+.stat-box{background:var(--bg2);padding:42px 30px;text-align:center;transition:background 0.3s;}
+.stat-box:hover{background:rgba(0,229,255,0.04);}
+.stat-box h2{font-family:var(--font-head);font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px;letter-spacing:-1px;}
+.stat-box p{font-size:0.78rem;color:var(--muted);font-weight:500;letter-spacing:0.8px;text-transform:uppercase;}
+
+/* FEATURES */
+.features{position:relative;z-index:1;padding:100px 80px;}
+.section-label{display:inline-flex;align-items:center;gap:10px;font-size:0.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:16px;}
+.section-label::before{content:'';width:30px;height:1px;background:var(--accent);}
+.section-title{font-family:var(--font-head);font-size:2.4rem;font-weight:800;letter-spacing:-1px;margin-bottom:12px;}
+.section-title span{color:var(--accent);}
+.section-sub{color:var(--muted);font-size:0.95rem;margin-bottom:60px;max-width:480px;line-height:1.7;}
+.cards-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}
+.feat-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:30px 24px;position:relative;overflow:hidden;transition:all 0.35s cubic-bezier(0.4,0,0.2,1);cursor:pointer;}
+.feat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--purple));opacity:0;transition:opacity 0.3s;}
+.feat-card::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(0,229,255,0.06) 0%,transparent 70%);opacity:0;transition:opacity 0.3s;}
+.feat-card:hover{border-color:rgba(0,229,255,0.3);transform:translateY(-6px);box-shadow:0 20px 60px rgba(0,0,0,0.5),0 0 0 1px rgba(0,229,255,0.12);}
+.feat-card:hover::before,.feat-card:hover::after{opacity:1;}
+.feat-icon{width:52px;height:52px;border-radius:14px;background:rgba(0,229,255,0.07);border:1px solid rgba(0,229,255,0.14);display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:20px;transition:all 0.3s;}
+.feat-card:hover .feat-icon{background:rgba(0,229,255,0.14);transform:scale(1.1);}
+.feat-card h3{font-family:var(--font-head);font-size:1.05rem;font-weight:700;margin-bottom:10px;}
+.feat-card p{font-size:0.84rem;color:var(--muted);line-height:1.65;}
+
+/* HOW IT WORKS */
+.how-section{position:relative;z-index:1;padding:80px 80px;background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;margin-top:60px;}
+.step{display:flex;flex-direction:column;align-items:flex-start;gap:16px;position:relative;}
+.step:not(:last-child)::after{content:'→';position:absolute;top:16px;right:-24px;color:var(--muted);font-size:1.2rem;}
+.step-num{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:800;font-size:1rem;color:#04070f;}
+.step h4{font-family:var(--font-head);font-size:1.05rem;font-weight:700;}
+.step p{font-size:0.84rem;color:var(--muted);line-height:1.65;}
+
+/* HELP BTN */
+.help-btn{position:fixed;bottom:28px;right:28px;width:54px;height:54px;background:linear-gradient(135deg,var(--accent),#0077ff);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#04070f;cursor:pointer;box-shadow:0 4px 24px rgba(0,229,255,0.45);z-index:150;transition:transform 0.25s,box-shadow 0.25s;}
+.help-btn:hover{transform:scale(1.12);box-shadow:0 6px 32px rgba(0,229,255,0.6);}
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:290;backdrop-filter:blur(4px);}
+.drawer-overlay.open{display:block;}
+.help-drawer{position:fixed;top:0;right:-420px;width:380px;height:100%;background:var(--card);border-left:1px solid var(--border);z-index:300;display:flex;flex-direction:column;transition:right 0.38s cubic-bezier(0.4,0,0.2,1);box-shadow:-8px 0 40px rgba(0,0,0,0.5);}
+.help-drawer.open{right:0;}
+.drawer-header{display:flex;align-items:center;justify-content:space-between;padding:22px 22px 16px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(0,229,255,0.06),rgba(124,58,237,0.06));}
+.drawer-title{display:flex;align-items:center;gap:14px;}
+.drawer-icon{width:44px;height:44px;border-radius:12px;background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.2);display:flex;align-items:center;justify-content:center;font-size:1.3rem;}
+.drawer-title h3{font-family:var(--font-head);font-size:1rem;font-weight:700;color:var(--text);margin-bottom:3px;}
+.drawer-title p{font-size:0.75rem;color:var(--muted);}
+.drawer-close{background:none;border:1px solid var(--border);color:var(--muted);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:0.85rem;transition:all 0.2s;display:flex;align-items:center;justify-content:center;}
+.drawer-close:hover{border-color:var(--accent);color:var(--accent);}
+.drawer-online{display:flex;align-items:center;gap:8px;padding:10px 22px;font-size:0.78rem;color:var(--green);background:rgba(0,255,163,0.05);border-bottom:1px solid rgba(0,255,163,0.1);}
+.online-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(0,255,163,0.6);animation:pulse 1.8s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.drawer-body{flex:1;overflow-y:auto;padding:24px 22px;display:flex;flex-direction:column;gap:16px;}
+.drawer-field{display:flex;flex-direction:column;gap:7px;}
+.drawer-field label{font-size:0.72rem;font-weight:700;color:var(--muted);letter-spacing:0.8px;text-transform:uppercase;}
+.input-wrap{display:flex;align-items:center;background:#0a0f1e;border:1px solid rgba(0,229,255,0.12);border-radius:10px;overflow:hidden;transition:border-color 0.2s,box-shadow 0.2s;}
+.input-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,229,255,0.1);}
+.input-icon{padding:0 12px;font-size:0.95rem;border-right:1px solid rgba(0,229,255,0.08);background:rgba(0,229,255,0.04);height:44px;display:flex;align-items:center;}
+.input-wrap input,.input-wrap select{flex:1;padding:11px 14px;background:transparent;border:none;outline:none;color:var(--text);font-family:var(--font-body);font-size:0.87rem;}
+.input-wrap select option{background:#0b1120;}
+.drawer-field textarea{width:100%;height:110px;padding:12px 14px;background:#0a0f1e;border:1px solid rgba(0,229,255,0.12);border-radius:10px;color:var(--text);font-family:var(--font-body);font-size:0.87rem;outline:none;resize:none;transition:border-color 0.2s,box-shadow 0.2s;}
+.drawer-field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,229,255,0.1);}
+.drawer-submit{width:100%;padding:13px;background:linear-gradient(90deg,var(--accent),#0077ff);color:#04070f;border:none;border-radius:10px;font-family:var(--font-body);font-weight:700;font-size:0.92rem;cursor:pointer;transition:all 0.25s;margin-top:4px;}
+.drawer-submit:hover{box-shadow:0 0 28px rgba(0,229,255,0.45);transform:translateY(-1px);}
+.drawer-success{display:none;text-align:center;padding:12px;background:rgba(0,255,163,0.08);border:1px solid rgba(0,255,163,0.2);border-radius:8px;color:var(--green);font-size:0.85rem;}
+.drawer-footer{display:flex;justify-content:center;gap:24px;padding:16px 22px;border-top:1px solid var(--border);background:rgba(0,229,255,0.02);}
+.drawer-footer a{font-size:0.8rem;color:var(--muted);text-decoration:none;transition:color 0.2s;}
+.drawer-footer a:hover{color:var(--accent);}
+
+footer{position:relative;z-index:1;text-align:center;padding:28px 20px;color:var(--muted);font-size:0.8rem;border-top:1px solid var(--border);}
+
+@media(max-width:1024px){
+  .hero{padding:60px 40px;flex-direction:column;text-align:center;min-height:auto;padding-top:80px;}
+  .hero-btns{justify-content:center;}
+  .hero-visual{margin-top:60px;}
+  .hero-img-wrap{width:300px;height:340px;}
+  .emotion-tag{display:none;}
+  .cards-grid{grid-template-columns:repeat(2,1fr);}
+  .stats-row{grid-template-columns:repeat(2,1fr);}
+  .features,.how-section{padding:60px 40px;}
+  .steps{grid-template-columns:1fr;}
+  .step:not(:last-child)::after{display:none;}
+}
+@media(max-width:600px){
+  header{padding:0 20px;}
+  .top-nav{display:none;}
+  .hero{padding:60px 24px 40px;}
+  .cards-grid{grid-template-columns:1fr;}
+  .features,.how-section{padding:50px 24px;}
+  .help-drawer{width:100%;right:-100%;}
+}
+  </style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+<div id="loader-bar"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="left-section">
+    <div class="menu-toggle" onclick="openMenu()">
+      <span></span><span></span><span></span>
+    </div>
+    <div class="logo">Emotion Detection</div>
+  </div>
+  <nav class="top-nav">
+    <a href="/">Home</a>
+    <div class="dropdown">
+      <a href="#">Product ▾</a>
+      <div class="dropdown-menu">
+        <a href="/face-detection">🧠 Face Detection</a>
+      </div>
+    </div>
+    <div class="dropdown">
+      <a href="#">Use Case ▾</a>
+      <div class="dropdown-menu">
+        <a href="/education">🎓 Education</a>
+        <a href="/healthcare">🏥 Healthcare</a>
+        <a href="/security">🔒 Security</a>
+      </div>
+    </div>
+    <div class="dropdown">
+      <a href="#">API ▾</a>
+      <div class="dropdown-menu">
+        <a href="/documentation">📄 Documentation</a>
+      </div>
+    </div>
+    {% if session.get('user_id') %}
+      <div style="display:flex;align-items:center;gap:10px;">
+        <a href="/camera" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:#e2eaff;font-size:0.88rem;font-weight:600;">
+          {% if session.get('user_photo') %}
+            <img src="{{ url_for('static', filename=session.get('user_photo')) }}"
+                 style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid #00e5ff;box-shadow:0 0 12px rgba(0,229,255,0.3);"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div style="display:none;width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#00e5ff,#0077ff);align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#020817;">
+              {{ session.get('user_name','U')[0]|upper }}
+            </div>
+          {% else %}
+            <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#00e5ff,#0077ff);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#020817;">
+              {{ session.get('user_name','U')[0]|upper }}
+            </div>
+          {% endif %}
+          {{ session.get('user_name','User') }}
+        </a>
+        <a href="/logout" style="padding:7px 16px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);color:#ef4444;font-size:0.82rem;font-weight:600;text-decoration:none;transition:all 0.2s;"
+           onmouseover="this.style.background='rgba(239,68,68,0.1)'" onmouseout="this.style.background='transparent'">
+          Logout
+        </a>
+      </div>
+    {% else %}
+      <a href="/login" class="login-btn">Login</a>
+    {% endif %}
+  </nav>
+</header>
+
+<!-- SIDEBAR -->
+<div id="sidebar" class="sidebar">
+  <button class="close-btn" onclick="closeMenu()">✕</button>
+  <a href="/">🏠 Home</a>
+  <div class="sidebar-toggle" id="productToggle" onclick="toggleSidebar('product')">
+    <span>📦 Product</span><span class="arrow">▼</span>
+  </div>
+  <div class="sidebar-dropdown" id="productDropdown">
+    <a href="/face-detection">🧠 Face Detection</a>
+  </div>
+  <div class="sidebar-toggle" id="usecaseToggle" onclick="toggleSidebar('usecase')">
+    <span>💡 Use Case</span><span class="arrow">▼</span>
+  </div>
+  <div class="sidebar-dropdown" id="usecaseDropdown">
+    <a href="/education">🎓 Education</a>
+    <a href="/security">🔒 Security</a>
+    <a href="/healthcare">🏥 Healthcare</a>
+  </div>
+    <a href="{{ url_for('documentation') }}">⚙️ API ▾</a> 
+  <a href="/history">📜 History</a>
+  <a href="/contact">📞 Contact Us</a>
+ <a href="/terms">📄 Terms &amp; Conditions</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-text">
+    <div class="hero-badge"><span class="dot"></span> AI Powered — Real Time</div>
+    <h1>
+      <span class="line1">Detect</span>
+      <span class="line2">Emotions</span>
+      <span class="line3">Understand People</span>
+    </h1>
+    <p>Next-generation facial emotion recognition powered by deep learning. Analyze expressions, detect feelings, and gain insights in milliseconds.</p>
+    <div class="hero-btns">
+      <a href="/login" class="btn-primary">⚡ Start Detection</a>
+      <label class="btn-secondary" for="imageUpload" style="cursor:pointer;">↑ Upload Image</label>
+      <input type="file" id="imageUpload" accept="image/*" style="display:none;" onchange="handleUpload(event)">
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-img-wrap">
+      <div class="emotion-tag e1">😊 Happy <div class="conf-bar"><div class="conf-fill"></div></div> 82%</div>
+      <div class="emotion-tag e2">😐 Neutral <div class="conf-bar"><div class="conf-fill"></div></div> 74%</div>
+      <div class="emotion-tag e3">😢 Sad <div class="conf-bar"><div class="conf-fill"></div></div> 91%</div>
+      <img src="https://images.pexels.com/photos/3762800/pexels-photo-3762800.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Emotion Detection AI" onerror="this.onerror=null;this.style.background='linear-gradient(135deg,#0b1120,#1a2040)';this.style.display='block'">
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ UPLOAD RESULT MODAL ══ -->
+<div class="upload-overlay" id="uploadOverlay" onclick="closeResult()"></div>
+<div class="upload-modal" id="uploadModal">
+  <button class="modal-close" onclick="closeResult()">✕</button>
+
+  <div class="modal-header">
+    <div class="modal-icon">🧠</div>
+    <div>
+      <h3>Emotion Analysis Result</h3>
+      <p>Powered by DeepFace AI</p>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="modal-loading" id="modalLoading">
+    <div class="spinner"></div>
+    <p>Analyzing facial expression...</p>
+  </div>
+
+  <!-- Result State -->
+  <div class="modal-result" id="modalResult" style="display:none;">
+    <div class="result-image-wrap">
+      <img id="previewImg" src="" alt="Uploaded face">
+      <div class="result-badge" id="resultBadge">😊 Happy</div>
+    </div>
+
+    <div class="result-details">
+      <div class="result-main">
+        <span class="result-label">Dominant Emotion</span>
+        <span class="result-emotion" id="dominantEmotion">—</span>
+      </div>
+
+      <div class="emotion-bars" id="emotionBars"></div>
+
+      <div class="result-meta" id="resultMeta"></div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div class="modal-error" id="modalError" style="display:none;">
+    <div style="font-size:2.5rem;margin-bottom:12px;">😕</div>
+    <p id="errorMsg">No face detected. Please try another image.</p>
+    <label for="imageUpload" class="retry-btn" onclick="closeResult()">Try Another Image</label>
+  </div>
+</div>
+
+<style>
+/* UPLOAD MODAL */
+.upload-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:400;backdrop-filter:blur(6px);}
+.upload-overlay.open{display:block;}
+
+.upload-modal{
+  display:none;position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(0.9);
+  width:min(700px,94vw);max-height:92vh;overflow-y:auto;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:24px;padding:32px;
+  z-index:500;
+  transition:transform 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.3s;
+  opacity:0;
+  box-shadow:0 40px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(0,229,255,0.1);
+}
+.upload-modal.open{display:block;transform:translate(-50%,-50%) scale(1);opacity:1;}
+
+.modal-close{position:absolute;top:16px;right:16px;background:none;border:1px solid var(--border);color:var(--muted);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:0.85rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+.modal-close:hover{border-color:var(--accent);color:var(--accent);}
+
+.modal-header{display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--border);}
+.modal-icon{width:46px;height:46px;border-radius:12px;background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.2);display:flex;align-items:center;justify-content:center;font-size:1.4rem;}
+.modal-header h3{font-family:var(--font-head);font-size:1rem;font-weight:700;margin-bottom:4px;}
+.modal-header p{font-size:0.75rem;color:var(--muted);}
+
+/* Loading */
+.modal-loading{display:flex;flex-direction:column;align-items:center;gap:16px;padding:30px 0;color:var(--muted);font-size:0.9rem;}
+.spinner{width:44px;height:44px;border:3px solid rgba(0,229,255,0.1);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Result */
+.modal-result{display:flex;flex-direction:column;gap:20px;}
+.result-image-wrap{position:relative;width:100%;border-radius:16px;overflow:hidden;background:#060a14;max-height:420px;display:flex;align-items:center;justify-content:center;}
+.result-image-wrap img{width:100%;height:auto;max-height:420px;object-fit:contain;object-position:center;display:block;}
+.result-badge{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(4,7,15,0.9);border:1px solid var(--border);backdrop-filter:blur(10px);border-radius:100px;padding:8px 20px;font-size:0.85rem;font-weight:700;color:var(--accent);white-space:nowrap;z-index:2;}
+
+.result-details{display:flex;flex-direction:column;gap:16px;}
+.result-main{display:flex;align-items:center;justify-content:space-between;}
+.result-label{font-size:0.75rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);}
+.result-emotion{font-family:var(--font-head);font-size:1.5rem;font-weight:800;background:linear-gradient(90deg,var(--accent),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+
+/* Emotion bars */
+.emotion-bars{display:flex;flex-direction:column;gap:10px;}
+.emo-row{display:flex;align-items:center;gap:12px;font-size:0.82rem;}
+.emo-name{width:80px;color:var(--muted);text-transform:capitalize;}
+.emo-bar-bg{flex:1;height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;}
+.emo-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--purple));transition:width 0.8s cubic-bezier(0.4,0,0.2,1);}
+.emo-pct{width:36px;text-align:right;color:var(--text);font-weight:600;}
+
+/* Meta info */
+.result-meta{display:flex;gap:12px;flex-wrap:wrap;}
+.meta-chip{background:rgba(0,229,255,0.06);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:0.78rem;color:var(--muted);}
+.meta-chip strong{color:var(--text);display:block;font-size:0.85rem;margin-bottom:2px;}
+
+/* Error */
+.modal-error{text-align:center;padding:20px 0;color:var(--muted);}
+.retry-btn{display:inline-block;margin-top:16px;padding:10px 24px;background:linear-gradient(135deg,var(--accent),#0077ff);color:#04070f;border-radius:8px;font-weight:700;font-size:0.88rem;cursor:pointer;text-decoration:none;}
+</style>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item"><span class="mdot">✦</span> Real-Time Detection</span>
+    <span class="marquee-item"><span class="mdot">✦</span> 99% Accuracy</span>
+    <span class="marquee-item"><span class="mdot">✦</span> Face Recognition</span>
+    <span class="marquee-item"><span class="mdot">✦</span> Emotion Analysis</span>
+    <span class="marquee-item"><span class="mdot">✦</span> Live Webcam</span>
+    <span class="marquee-item"><span class="mdot">✦</span> REST API Ready</span>
+    <span class="marquee-item"><span class="mdot">✦</span> Deep Learning</span>
+    <span class="marquee-item"><span class="mdot">✦</span> Secure &amp; Private</span>
+    <span class="marquee-item"><span class="mdot">✦</span> Real-Time Detection</span>
+    <span class="marquee-item"><span class="mdot">✦</span> 99% Accuracy</span>
+    <span class="marquee-item"><span class="mdot">✦</span> Face Recognition</span>
+    <span class="marquee-item"><span class="mdot">✦</span> Emotion Analysis</span>
+    <span class="marquee-item"><span class="mdot">✦</span> Live Webcam</span>
+    <span class="marquee-item"><span class="mdot">✦</span> REST API Ready</span>
+    <span class="marquee-item"><span class="mdot">✦</span> Deep Learning</span>
+    <span class="marquee-item"><span class="mdot">✦</span> Secure &amp; Private</span>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-row">
+  <div class="stat-box"><h2>1M+</h2><p>Detections Done</p></div>
+  <div class="stat-box"><h2>99%</h2><p>Accuracy Rate</p></div>
+  <div class="stat-box"><h2>50K+</h2><p>Active Users</p></div>
+  <div class="stat-box"><h2>&lt;80ms</h2><p>Response Time</p></div>
+</div>
+
+<!-- FEATURES -->
+<section class="features">
+  <div class="section-label">Core Features</div>
+  <h2 class="section-title">Everything You Need to <span>Detect</span></h2>
+  <p class="section-sub">From live webcam feeds to batch image processing — our AI handles it all with unmatched precision.</p>
+  <div class="cards-grid">
+    <div class="feat-card"><div class="feat-icon">🎥</div><h3>Live Detection</h3><p>Real-time emotion analysis directly from your webcam with zero latency frame processing.</p></div>
+    <div class="feat-card"><div class="feat-icon">🖼️</div><h3>Image Upload</h3><p>Upload any image and get detailed emotion breakdowns with confidence scores for every face.</p></div>
+    <div class="feat-card"><div class="feat-icon">📊</div><h3>Analytics</h3><p>Deep insights, heatmaps, and emotion timelines to understand patterns over time.</p></div>
+    <div class="feat-card"><div class="feat-icon">⚙️</div><h3>REST API</h3><p>Integrate into any app with our well-documented REST API. Supports Python, JS, and more.</p></div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section">
+  <div class="section-label">How It Works</div>
+  <h2 class="section-title">3 Simple <span>Steps</span></h2>
+  <p class="section-sub">Get started in minutes. No complex setup required.</p>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><h4>Upload or Stream</h4><p>Provide an image URL, upload a file, or connect your webcam for live analysis.</p></div>
+    <div class="step"><div class="step-num">2</div><h4>AI Analyzes</h4><p>Our deep learning model detects all faces and analyzes 7 core emotions in under 80ms.</p></div>
+    <div class="step"><div class="step-num">3</div><h4>Get Results</h4><p>Receive structured JSON with emotion scores, confidence levels, and facial landmarks.</p></div>
+  </div>
+</section>
+
+<!-- HELP BUTTON -->
+<div class="help-btn" onclick="openHelp()">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+</div>
+
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeHelp()"></div>
+<div class="help-drawer" id="helpDrawer">
+  <div class="drawer-header">
+    <div class="drawer-title">
+      <div class="drawer-icon">🎧</div>
+      <div><h3>Need Assistance?</h3><p>We reply within a few hours</p></div>
+    </div>
+    <button class="drawer-close" onclick="closeHelp()">✕</button>
+  </div>
+  <div class="drawer-online"><span class="online-dot"></span> Our team is online</div>
+  <div class="drawer-body">
+    <div class="drawer-field"><label>Full Name</label><div class="input-wrap"><span class="input-icon">👤</span><input type="text" placeholder="Enter your full name"></div></div>
+    <div class="drawer-field"><label>Phone Number</label><div class="input-wrap"><span class="input-icon">📞</span><input type="tel" placeholder="+91 98765 43210"></div></div>
+    <div class="drawer-field"><label>Subject</label><div class="input-wrap"><span class="input-icon">📋</span><select><option value="" disabled selected>Select a topic</option><option>General Enquiry</option><option>Technical Support</option><option>API Help</option><option>Billing</option><option>Other</option></select></div></div>
+    <div class="drawer-field"><label>Message</label><textarea placeholder="Describe your issue or question..."></textarea></div>
+    <button class="drawer-submit" onclick="submitDrawer()">Send Message &nbsp;🚀</button>
+    <div class="drawer-success" id="drawerSuccess">✅ Message sent! We'll get back to you soon.</div>
+  </div>
+  <div class="drawer-footer"><a href="/contact">📞 Contact Us</a><a href="/documentation">📄 API Docs</a></div>
+</div>
+
+<footer>&copy; 2025 Emotion Detection. All rights reserved.</footer>
+
+<script>
+
+
+/* Particles */
+const canvas=document.getElementById('particles'),ctx=canvas.getContext('2d');
+let W,H,pts=[];
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+resize();window.addEventListener('resize',resize);
+for(let i=0;i<80;i++) pts.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+0.3,dx:(Math.random()-0.5)*0.35,dy:(Math.random()-0.5)*0.35,a:Math.random()});
+(function draw(){
+  ctx.clearRect(0,0,W,H);
+  pts.forEach(p=>{
+    p.x+=p.dx;p.y+=p.dy;
+    if(p.x<0)p.x=W;if(p.x>W)p.x=0;
+    if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(0,229,255,${p.a*0.4})`;ctx.fill();
+  });
+  requestAnimationFrame(draw);
+})();
+
+/* Sidebar */
+function openMenu(){document.getElementById('sidebar').classList.add('active');}
+function closeMenu(){document.getElementById('sidebar').classList.remove('active');}
+function toggleSidebar(s){
+  const d=document.getElementById(s+'Dropdown'),t=document.getElementById(s+'Toggle');
+  d.classList.toggle('open',!d.classList.contains('open'));
+  t.classList.toggle('open',!t.classList.contains('open'));
+}
+
+/* Drawer */
+function openHelp(){document.getElementById('helpDrawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('open');document.body.style.overflow='hidden';}
+function closeHelp(){document.getElementById('helpDrawer').classList.remove('open');document.getElementById('drawerOverlay').classList.remove('open');document.body.style.overflow='';}
+function submitDrawer(){document.getElementById('drawerSuccess').style.display='block';setTimeout(()=>document.getElementById('drawerSuccess').style.display='none',3500);}
+
+/* Loader */
+document.querySelectorAll('a').forEach(l=>l.addEventListener('click',()=>{let b=document.getElementById('loader-bar');b.style.opacity='1';b.style.width='100%';}));
+window.onload=()=>{let b=document.getElementById('loader-bar');b.style.width='100%';setTimeout(()=>{b.style.opacity='0';b.style.width='0%';},400);};
+
+/* Scroll Reveal */
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='translateY(0)';}});},{threshold:0.1});
+document.querySelectorAll('.feat-card,.stat-box,.step').forEach(el=>{el.style.opacity='0';el.style.transform='translateY(30px)';el.style.transition='opacity 0.6s ease,transform 0.6s ease';obs.observe(el);});
+
+/* ══ IMAGE UPLOAD & DETECTION ══ */
+const EMOTION_EMOJI = {
+  happy:'😊', sad:'😢', angry:'😠', surprise:'😲',
+  fear:'😨', disgust:'🤢', neutral:'😐', contempt:'😒'
+};
+
+function openModal() {
+  document.getElementById('uploadOverlay').classList.add('open');
+  const modal = document.getElementById('uploadModal');
+  modal.style.display = 'block';
+  setTimeout(() => modal.classList.add('open'), 10);
+  document.body.style.overflow = 'hidden';
+}
+
+function closeResult() {
+  document.getElementById('uploadOverlay').classList.remove('open');
+  const modal = document.getElementById('uploadModal');
+  modal.classList.remove('open');
+  setTimeout(() => modal.style.display = 'none', 300);
+  document.body.style.overflow = '';
+  // Reset states
+  document.getElementById('modalLoading').style.display = 'flex';
+  document.getElementById('modalResult').style.display = 'none';
+  document.getElementById('modalError').style.display = 'none';
+}
+
+async function handleUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  // Show modal with loading
+  openModal();
+  document.getElementById('modalLoading').style.display = 'flex';
+  document.getElementById('modalResult').style.display = 'none';
+  document.getElementById('modalError').style.display = 'none';
+
+  // Preview image
+  const reader = new FileReader();
+  reader.onload = e => document.getElementById('previewImg').src = e.target.result;
+  reader.readAsDataURL(file);
+
+  // Send to Flask backend
+  const formData = new FormData();
+  formData.append('image', file);
+
+  try {
+    const res = await fetch('/detect-emotion', {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+
+    if (data.error) {
+      showError(data.error);
+      return;
+    }
+
+    showResult(data);
+
+  } catch (err) {
+    showError('Server se connect nahi ho saka. Please try again.');
+  }
+
+  // Reset file input
+  event.target.value = '';
+}
+
+function showResult(data) {
+  document.getElementById('modalLoading').style.display = 'none';
+  document.getElementById('modalResult').style.display = 'flex';
+
+  const emotion = data.dominant_emotion || 'neutral';
+  const emoji   = EMOTION_EMOJI[emotion.toLowerCase()] || '🙂';
+
+  // Badge & dominant
+  document.getElementById('resultBadge').textContent = emoji + ' ' + capitalize(emotion);
+  document.getElementById('dominantEmotion').textContent = capitalize(emotion);
+
+  // Emotion bars
+  const barsDiv = document.getElementById('emotionBars');
+  barsDiv.innerHTML = '';
+  if (data.emotions) {
+    const sorted = Object.entries(data.emotions).sort((a,b) => b[1]-a[1]);
+    sorted.forEach(([name, score]) => {
+      const pct = Math.round(score * 100);
+      barsDiv.innerHTML += `
+        <div class="emo-row">
+          <span class="emo-name">${EMOTION_EMOJI[name]||''} ${capitalize(name)}</span>
+          <div class="emo-bar-bg"><div class="emo-bar-fill" style="width:0%" data-pct="${pct}%"></div></div>
+          <span class="emo-pct">${pct}%</span>
+        </div>`;
+    });
+    // Animate bars
+    setTimeout(() => {
+      document.querySelectorAll('.emo-bar-fill').forEach(b => {
+        b.style.width = b.dataset.pct;
+      });
+    }, 100);
+  }
+
+  // Meta chips
+  const meta = document.getElementById('resultMeta');
+  meta.innerHTML = '';
+  if (data.age)    meta.innerHTML += `<div class="meta-chip"><strong>${data.age}</strong>Age Estimate</div>`;
+  if (data.gender) meta.innerHTML += `<div class="meta-chip"><strong>${capitalize(data.gender)}</strong>Gender</div>`;
+  if (data.race)   meta.innerHTML += `<div class="meta-chip"><strong>${capitalize(data.race)}</strong>Ethnicity</div>`;
+}
+
+function showError(msg) {
+  document.getElementById('modalLoading').style.display = 'none';
+  document.getElementById('modalError').style.display = 'block';
+  document.getElementById('errorMsg').textContent = msg;
+}
+
+function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+</script>
+</body>
+</html>

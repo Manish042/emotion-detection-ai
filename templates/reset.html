@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reset Password — Emotion AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+  <style>
+    .toast {
+      position: fixed; top: 24px; right: 24px;
+      padding: 12px 20px; border-radius: 10px;
+      font-size: 14px; font-weight: 600;
+      z-index: 9999; display: none;
+      max-width: 320px; line-height: 1.5;
+      animation: slideIn 0.3s ease;
+    }
+    .toast.success { background:rgba(34,197,94,0.15); border:1px solid rgba(34,197,94,0.4); color:#22c55e; }
+    .toast.error   { background:rgba(239,68,68,0.15);  border:1px solid rgba(239,68,68,0.4);  color:#ef4444; }
+    @keyframes slideIn { from{opacity:0;transform:translateX(30px)} to{opacity:1;transform:translateX(0)} }
+
+    .loader-overlay {
+      position: fixed; inset: 0; background: #020817;
+      z-index: 99999; display: none;
+      flex-direction: column; align-items: center; justify-content: center; gap: 24px;
+    }
+    .loader-overlay.show { display: flex; }
+    .loader-logo { font-family:'Orbitron',monospace; font-size:18px; font-weight:900; color:#58a6ff; letter-spacing:3px; }
+    .loader-ring { width:64px; height:64px; border:3px solid rgba(88,166,255,0.15); border-top-color:#58a6ff; border-radius:50%; animation:spin 0.8s linear infinite; }
+    .loader-text { font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:600; color:#475569; letter-spacing:2px; text-transform:uppercase; }
+    .loader-bar { position:absolute; top:0; left:0; height:2px; background:linear-gradient(90deg,#58a6ff,#a78bfa); animation:loadBar 1.5s ease infinite; }
+    @keyframes spin    { to { transform:rotate(360deg); } }
+    @keyframes loadBar { 0%{width:0%;left:0} 50%{width:70%;left:0} 100%{width:100%;left:0} }
+
+    /* Step indicator */
+    .steps-bar { display:flex; align-items:center; justify-content:center; gap:0; margin-bottom:24px; }
+    .step-dot {
+      width:32px; height:32px; border-radius:50%;
+      background:rgba(88,166,255,0.08); border:1px solid #1e293b;
+      display:flex; align-items:center; justify-content:center;
+      font-size:12px; font-weight:700; color:#475569;
+      font-family:'Orbitron',monospace; transition:all 0.3s;
+    }
+    .step-dot.active { background:rgba(88,166,255,0.15); border-color:#58a6ff; color:#58a6ff; }
+    .step-dot.done   { background:rgba(34,197,94,0.15);  border-color:#22c55e; color:#22c55e; }
+    .step-line { width:40px; height:1px; background:#1e293b; }
+
+    /* OTP inputs */
+    .otp-row { display:flex; gap:10px; justify-content:center; margin:12px 0; }
+    .otp-input {
+      width:46px; height:54px; text-align:center;
+      background:#0d1117; border:1px solid #1e293b;
+      border-radius:10px; color:#e2eaff;
+      font-size:22px; font-weight:700;
+      font-family:'Orbitron',monospace;
+      outline:none; transition:border-color 0.2s;
+    }
+    .otp-input:focus { border-color:#58a6ff; }
+
+    .resend-link {
+      text-align:center; font-size:13px;
+      color:#475569; margin-top:8px; cursor:pointer;
+    }
+    .resend-link a { color:#58a6ff; cursor:pointer; }
+    .resend-link a:hover { text-decoration:underline; }
+
+    .panel { display:none; }
+    .panel.active { display:block; }
+  </style>
+</head>
+<body>
+
+<div class="loader-overlay" id="loaderOverlay">
+  <div class="loader-bar"></div>
+  <div class="loader-logo">Emotion AI</div>
+  <div class="loader-ring"></div>
+  <div class="loader-text" id="loaderText">Please wait...</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="page">
+  <div class="card">
+
+    <div class="logo"><div class="logo-dot"></div>Emotion Detection</div>
+    <h2>Reset Password</h2>
+    <p class="subtitle">Step-by-step password recovery</p>
+
+    <!-- Step indicator -->
+    <div class="steps-bar">
+      <div class="step-dot active" id="s1">1</div>
+      <div class="step-line"></div>
+      <div class="step-dot" id="s2">2</div>
+      <div class="step-line"></div>
+      <div class="step-dot" id="s3">3</div>
+    </div>
+
+    <!-- Step 1: Email -->
+    <div class="panel active" id="step1">
+      <div class="form-group">
+        <label>Registered Email</label>
+        <input type="email" id="reset-email" placeholder="you@example.com" />
+      </div>
+      <button class="btn-primary" onclick="sendOTP()">Send OTP</button>
+      <p class="footer-text" style="margin-top:1.2rem;">
+        Yaad aa gaya? <a href="/login" style="color:#58a6ff;">Login karo</a>
+      </p>
+    </div>
+
+    <!-- Step 2: OTP -->
+    <div class="panel" id="step2">
+      <p style="font-size:13px;color:#64748b;margin-bottom:16px;text-align:center;">
+        OTP bheja gaya <span id="emailShow" style="color:#58a6ff;"></span> pe
+      </p>
+      <div class="otp-row">
+        <input class="otp-input" id="o1" maxlength="1" oninput="otpMove(this,'o2')" onkeydown="otpBack(event,this,'')"/>
+        <input class="otp-input" id="o2" maxlength="1" oninput="otpMove(this,'o3')" onkeydown="otpBack(event,this,'o1')"/>
+        <input class="otp-input" id="o3" maxlength="1" oninput="otpMove(this,'o4')" onkeydown="otpBack(event,this,'o2')"/>
+        <input class="otp-input" id="o4" maxlength="1" oninput="otpMove(this,'o5')" onkeydown="otpBack(event,this,'o3')"/>
+        <input class="otp-input" id="o5" maxlength="1" oninput="otpMove(this,'o6')" onkeydown="otpBack(event,this,'o4')"/>
+        <input class="otp-input" id="o6" maxlength="1" oninput="otpMove(this,'')"   onkeydown="otpBack(event,this,'o5')"/>
+      </div>
+      <div class="resend-link">OTP is not received <a onclick="sendOTP(true)">Resend it!</a></div>
+      <button class="btn-primary" style="margin-top:1rem;" onclick="verifyOTP()">Verify OTP</button>
+    </div>
+
+    <!-- Step 3: New Password -->
+    <div class="panel" id="step3">
+      <div class="form-group">
+        <label>New Password</label>
+        <input type="password" id="new-password" placeholder="Min 6 characters" />
+      </div>
+      <div class="form-group">
+        <label>Confirm New Password</label>
+        <input type="password" id="confirm-password" placeholder="Repeat new password" />
+      </div>
+      <button class="btn-primary" onclick="resetPassword()">Reset Password</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  let currentEmail = '';
+  let verifiedOTP  = '';
+
+  function showToast(msg, type='error') {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = 'toast ' + type;
+    t.style.display = 'block';
+    setTimeout(() => t.style.display = 'none', 3500);
+  }
+
+  function showLoader(text='Please wait...') {
+    document.getElementById('loaderText').textContent = text;
+    document.getElementById('loaderOverlay').classList.add('show');
+  }
+  function hideLoader() {
+    document.getElementById('loaderOverlay').classList.remove('show');
+  }
+
+  function setStep(n) {
+    [1,2,3].forEach(i => {
+      document.getElementById('step'+i).classList.remove('active');
+      const dot = document.getElementById('s'+i);
+      dot.classList.remove('active','done');
+      if (i < n) dot.classList.add('done');
+    });
+    document.getElementById('step'+n).classList.add('active');
+    document.getElementById('s'+n).classList.add('active');
+  }
+
+  // OTP box auto-move
+  function otpMove(el, nextId) {
+    if (el.value.length === 1 && nextId) document.getElementById(nextId).focus();
+  }
+  function otpBack(e, el, prevId) {
+    if (e.key === 'Backspace' && el.value === '' && prevId)
+      document.getElementById(prevId).focus();
+  }
+  function getOTP() {
+    return ['o1','o2','o3','o4','o5','o6'].map(id => document.getElementById(id).value).join('');
+  }
+
+  // Step 1: Send OTP
+  async function sendOTP(resend=false) {
+    const email = document.getElementById('reset-email').value.trim();
+    if (!email) { showToast('❌ Email daalo!'); return; }
+
+    currentEmail = email;
+    showLoader('OTP bhej raha hoon...');
+
+    try {
+      const res  = await fetch('/forgot-password', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json();
+      hideLoader();
+
+      if (data.success) {
+        showToast(data.message, 'success');
+        document.getElementById('emailShow').textContent = email;
+        if (!resend) setStep(2);
+        ['o1','o2','o3','o4','o5','o6'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('o1').focus();
+      } else {
+        showToast(data.message, 'error');
+      }
+    } catch(e) {
+      hideLoader();
+      showToast('❌ Server error!', 'error');
+    }
+  }
+
+  // Step 2: Verify OTP
+  async function verifyOTP() {
+    const otp = getOTP();
+    if (otp.length < 6) { showToast('❌ Poora 6-digit OTP daalo!'); return; }
+
+    showLoader('OTP verify kar raha hoon...');
+
+    try {
+      const res  = await fetch('/verify-otp', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ email: currentEmail, otp })
+      });
+      const data = await res.json();
+      hideLoader();
+
+      if (data.success) {
+        verifiedOTP = otp;
+        showToast('✅ OTP verified!', 'success');
+        setStep(3);
+      } else {
+        showToast(data.message, 'error');
+      }
+    } catch(e) {
+      hideLoader();
+      showToast('❌ Server error!', 'error');
+    }
+  }
+
+  // Step 3: Reset Password
+  async function resetPassword() {
+    const password = document.getElementById('new-password').value;
+    const confirm  = document.getElementById('confirm-password').value;
+
+    if (!password || !confirm) { showToast('❌ Dono fields bharo!'); return; }
+    if (password.length < 6)   { showToast('❌ Password kam se kam 6 characters ka hona chahiye!'); return; }
+    if (password !== confirm)  { showToast('❌ Passwords match nahi kar rahe!'); return; }
+
+    showLoader('Password reset ho raha hai...');
+
+    try {
+      const res  = await fetch('/reset-password', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ email: currentEmail, otp: verifiedOTP, password, confirm })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        document.getElementById('loaderText').textContent = '✅ Password reset ho gaya!';
+        setTimeout(() => { window.location.href = '/login'; }, 1500);
+      } else {
+        hideLoader();
+        showToast(data.message, 'error');
+      }
+    } catch(e) {
+      hideLoader();
+      showToast('❌ Server error!', 'error');
+    }
+  }
+</script>
+
+</body>
+</html>

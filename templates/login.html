@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Emotion Detection - Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+  <style>
+    .toast {
+      position:fixed; top:24px; right:24px;
+      padding:12px 20px; border-radius:10px;
+      font-size:14px; font-weight:600;
+      z-index:9999; display:none; max-width:320px; line-height:1.5;
+    }
+    .toast.success { background:rgba(34,197,94,0.15); border:1px solid rgba(34,197,94,0.4); color:#22c55e; }
+    .toast.error   { background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.4); color:#ef4444; }
+
+    .loader-overlay {
+      position:fixed; inset:0; background:#020817;
+      z-index:99999; display:none;
+      flex-direction:column; align-items:center; justify-content:center; gap:24px;
+    }
+    .loader-overlay.show { display:flex; }
+    .loader-logo { font-family:'Orbitron',monospace; font-size:18px; font-weight:900; color:#58a6ff; letter-spacing:3px; }
+    .loader-ring { width:64px; height:64px; border:3px solid rgba(88,166,255,0.15); border-top-color:#58a6ff; border-radius:50%; animation:spin 0.8s linear infinite; }
+    .loader-text { font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:600; color:#475569; letter-spacing:2px; text-transform:uppercase; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* ---- Profile Photo Upload ---- */
+    .photo-wrap {
+      display:flex; flex-direction:column;
+      align-items:center; gap:10px;
+      margin-bottom:1.2rem;
+    }
+    .photo-circle {
+      width:88px; height:88px; border-radius:50%;
+      border:2px dashed #30363d;
+      background:#0d1117;
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; overflow:hidden;
+      position:relative; transition:border-color 0.2s;
+    }
+    .photo-circle:hover { border-color:#58a6ff; }
+    .photo-circle img {
+      width:100%; height:100%;
+      object-fit:cover; border-radius:50%;
+      display:none;
+    }
+    .photo-placeholder {
+      display:flex; flex-direction:column;
+      align-items:center; gap:4px;
+    }
+    .photo-placeholder svg { width:28px; height:28px; stroke:#475569; fill:none; stroke-width:1.5; }
+    .photo-placeholder span { font-size:9px; color:#475569; letter-spacing:1.5px; text-transform:uppercase; }
+    .photo-edit-badge {
+      position:absolute; bottom:2px; right:2px;
+      width:22px; height:22px; border-radius:50%;
+      background:#58a6ff; border:2px solid #0d1117;
+      display:none; align-items:center; justify-content:center;
+    }
+    .photo-edit-badge svg { width:11px; height:11px; stroke:white; fill:none; stroke-width:2.5; }
+    .photo-hint { font-size:11px; color:#475569; letter-spacing:0.5px; }
+    #photoInput { display:none; }
+
+    /* Social Buttons Fix */
+    .social-btns { display:flex !important; gap:10px !important; flex-direction:row !important; }
+    .btn-social {
+      flex:1 !important; display:flex !important;
+      align-items:center !important; justify-content:center !important;
+      gap:8px !important; padding:10px 8px !important;
+      background:#0d1117 !important; border:1px solid #30363d !important;
+      border-radius:10px !important; color:#e6edf3 !important;
+      font-size:13px !important; font-weight:600 !important;
+      cursor:pointer !important; transition:all 0.2s !important;
+      white-space:nowrap !important; min-width:0 !important;
+      overflow:hidden !important; font-family:Rajdhani,sans-serif !important;
+    }
+    .btn-social:hover { border-color:#58a6ff !important; background:#161b22 !important; }
+    .btn-social .google-icon { width:18px !important; height:18px !important; flex-shrink:0 !important; }
+    .btn-social .fb-icon {
+      width:18px !important; height:18px !important;
+      background:#1877f2 !important; border-radius:4px !important;
+      display:flex !important; align-items:center !important; justify-content:center !important;
+      color:white !important; font-size:12px !important; font-weight:700 !important;
+      flex-shrink:0 !important;
+    }
+  </style>
+</head>
+<body>
+
+<div class="loader-overlay" id="loaderOverlay">
+  <div class="loader-logo">Emotion AI</div>
+  <div class="loader-ring"></div>
+  <div class="loader-text" id="loaderText">Please wait...</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="page">
+
+  <!-- Back to Home -->
+  <a href="/" style="
+    position:fixed; top:20px; left:24px;
+    display:flex; align-items:center; gap:8px;
+    color:#475569; text-decoration:none;
+    font-size:13px; font-weight:600;
+    font-family:Rajdhani,sans-serif;
+    letter-spacing:1px;
+    transition:color 0.2s;
+    z-index:10;
+  " onmouseover="this.style.color='#58a6ff'" onmouseout="this.style.color='#475569'">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5M5 12l7-7M5 12l7 7"/>
+    </svg>
+    Back to Home
+  </a>
+
+  <div class="card">
+
+    <div class="logo"><div class="logo-dot"></div>Emotion Detection</div>
+    <h2 id="main-title">Welcome Back</h2>
+    <p class="subtitle" id="main-sub">Sign in to your account</p>
+
+    <div class="tabs">
+      <div class="tab active" id="tab-login" onclick="switchTab('login')">Login</div>
+      <div class="tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</div>
+    </div>
+
+    <!-- ===== LOGIN PANEL ===== -->
+    <div class="panel active" id="panel-login">
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="login-email" placeholder="you@example.com" />
+      </div>
+<div class="form-group">
+  <label>Password</label>
+
+  <div class="password-wrapper">
+
+    <input type="password"
+           id="login-password"
+           placeholder="Enter your password">
+
+    <span class="eye-icon"
+          onclick="togglePassword()">
+      👁
+    </span>
+
+  </div>
+</div>
+      <div class="check-row">
+        <input type="checkbox" id="remember" />
+        <label for="remember">Remember me</label>
+      </div>
+      <button class="btn-primary" id="loginBtn" onclick="doLogin()">Sign In</button>
+
+      <div class="divider"><div class="divider-line"></div><span>or continue with</span><div class="divider-line"></div></div>
+      <div class="social-btns">
+        <button class="btn-social" onclick="socialMsg()">
+          <svg class="google-icon" viewBox="0 0 48 48">
+            <path fill="#FFC107" d="M43.6 20H24v8h11.3C33.6 33 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 19.7-8 19.7-20 0-1.3-.1-2.7-.1-4z"/>
+            <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16 19 13 24 13c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34 6.5 29.3 4 24 4c-7.7 0-14.3 4.3-17.7 10.7z"/>
+            <path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5l-6.2-5.2C29.3 35.3 26.8 36 24 36c-5.2 0-9.6-3-11.4-7.4l-6.6 5.1C9.7 39.7 16.3 44 24 44z"/>
+            <path fill="#1976D2" d="M43.6 20H24v8h11.3c-.8 2.3-2.3 4.2-4.2 5.6l6.2 5.2C41 35.4 44 30 44 24c0-1.3-.1-2.7-.4-4z"/>
+          </svg>
+          Google
+        </button>
+        <button class="btn-social btn-facebook" onclick="socialMsg()">
+          <div class="fb-icon">f</div>
+          Facebook
+        </button>
+      </div>
+      <p class="footer-text">Don't have an account? <a onclick="switchTab('signup')">Sign up free</a></p>
+    </div>
+
+    <!-- ===== SIGNUP PANEL ===== -->
+    <div class="panel" id="panel-signup">
+
+      <!-- Profile Photo -->
+      <div class="photo-wrap">
+        <div class="photo-circle" id="photoCircle" onclick="document.getElementById('photoInput').click()">
+          <img id="photoPreview" src="" alt="Profile" />
+          <div class="photo-placeholder" id="photoPlaceholder">
+            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Add Photo</span>
+          </div>
+          <div class="photo-edit-badge" id="photoEditBadge">
+            <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div>
+        </div>
+        <span class="photo-hint">Profile photo (optional)</span>
+        <input type="file" id="photoInput" accept="image/jpeg,image/png,image/webp" onchange="previewPhoto(this)" />
+      </div>
+
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="signup-name" placeholder="Your full name" />
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="signup-email" placeholder="you@example.com" />
+      </div>
+ <div class="form-group">
+  <label>Password</label>
+
+  <div class="password-wrapper">
+    <input type="password"
+           id="signup-password"
+           placeholder="Min 6 characters">
+
+    <span class="eye-icon"
+          onclick="togglePassword('signup-password')">
+      👁
+    </span>
+  </div>
+</div>
+      <div class="check-row">
+        <input type="checkbox" id="terms" />
+        <label for="terms">I agree to the Terms &amp; Privacy Policy</label>
+      </div>
+      <button class="btn-primary" id="signupBtn" onclick="doSignup()">Create Account</button>
+
+      <div class="divider"><div class="divider-line"></div><span>or register with</span><div class="divider-line"></div></div>
+      <div class="social-btns">
+        <button class="btn-social" onclick="socialMsg()">
+          <svg class="google-icon" viewBox="0 0 48 48">
+            <path fill="#FFC107" d="M43.6 20H24v8h11.3C33.6 33 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 19.7-8 19.7-20 0-1.3-.1-2.7-.1-4z"/>
+            <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16 19 13 24 13c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34 6.5 29.3 4 24 4c-7.7 0-14.3 4.3-17.7 10.7z"/>
+            <path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5l-6.2-5.2C29.3 35.3 26.8 36 24 36c-5.2 0-9.6-3-11.4-7.4l-6.6 5.1C9.7 39.7 16.3 44 24 44z"/>
+            <path fill="#1976D2" d="M43.6 20H24v8h11.3c-.8 2.3-2.3 4.2-4.2 5.6l6.2 5.2C41 35.4 44 30 44 24c0-1.3-.1-2.7-.4-4z"/>
+          </svg>
+          Google
+        </button>
+        <button class="btn-social btn-facebook" onclick="socialMsg()">
+          <div class="fb-icon">f</div>
+          Facebook
+        </button>
+      </div>
+      <p class="footer-text">Already have an account? <a onclick="switchTab('login')">Sign in</a></p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function switchTab(tab) {
+    ['login','signup'].forEach(t => {
+      document.getElementById('panel-'+t).classList.remove('active');
+      document.getElementById('tab-'+t).classList.remove('active');
+    });
+    document.getElementById('panel-'+tab).classList.add('active');
+    document.getElementById('tab-'+tab).classList.add('active');
+    document.getElementById('main-title').textContent = tab==='login' ? 'Welcome Back' : 'Create Account';
+    document.getElementById('main-sub').textContent   = tab==='login' ? 'Sign in to your account' : 'Join Emotion Detection for free';
+  }
+
+  function showToast(msg, type='error') {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = 'toast '+type;
+    t.style.display = 'block';
+    setTimeout(() => t.style.display='none', 3500);
+  }
+
+  function showLoader(text) {
+    document.getElementById('loaderText').textContent = text;
+    document.getElementById('loaderOverlay').classList.add('show');
+  }
+  function hideLoader() { document.getElementById('loaderOverlay').classList.remove('show'); }
+
+  // ---- Profile photo preview ----
+  function previewPhoto(input) {
+    if (!input.files[0]) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = document.getElementById('photoPreview');
+      img.src          = e.target.result;
+      img.style.display = 'block';
+      document.getElementById('photoPlaceholder').style.display = 'none';
+      document.getElementById('photoEditBadge').style.display   = 'flex';
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+
+function togglePassword() {
+  const password = document.getElementById("login-password");
+
+  if (password.type === "password") {
+    password.type = "text";
+  } else {
+    password.type = "password";
+  }
+}
+
+function togglePassword() {
+  const password = document.getElementById("signup-password");
+
+  if (password.type === "password") {
+    password.type = "text";
+  } else {
+    password.type = "password";
+  }
+}
+
+
+  // ---- LOGIN ----
+  async function doLogin() {
+    const email    = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    if (!email || !password) { showToast('❌ Fill Email aur Password!'); return; }
+
+    showLoader('Signing in...');
+    try {
+      const res  = await fetch('/login', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById('loaderText').textContent = '✅ ' + data.message;
+        setTimeout(() => window.location.href = data.redirect || '/camera', 900);
+      } else {
+        hideLoader(); showToast(data.message, 'error');
+      }
+    } catch(e) { hideLoader(); showToast('❌ Server error!', 'error'); }
+  }
+
+  // ---- SIGNUP — multipart/form-data (photo support) ----
+  async function doSignup() {
+    const name     = document.getElementById('signup-name').value.trim();
+    const email    = document.getElementById('signup-email').value.trim();
+    const password = document.getElementById('signup-password').value;
+    const confirm  = document.getElementById('signup-confirm').value;
+    const terms    = document.getElementById('terms').checked;
+    const photo    = document.getElementById('photoInput').files[0];
+
+    if (!name || !email || !password || !confirm) { showToast('❌ fill all fields!'); return; }
+    if (!terms)             { showToast('❌ accept terms!'); return; }
+    if (password.length<6)  { showToast('❌ Password is atleast 6 character!'); return; }
+    if (password !== confirm){ showToast('❌ Passwords is not match'); return; }
+
+    showLoader('Creating account...');
+
+    // FormData — supports file upload
+    const fd = new FormData();
+    fd.append('full_name',        name);
+    fd.append('email',            email);
+    fd.append('password',         password);
+    fd.append('confirm_password', confirm);
+    if (photo) fd.append('photo', photo);
+
+    try {
+      const res  = await fetch('/signup', { method:'POST', body:fd });
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById('loaderText').textContent = '🎉 Account ban gaya! Login karo...';
+        await fetch('/logout');
+        setTimeout(() => {
+          hideLoader();
+          switchTab('login');
+          document.getElementById('login-email').value = email;
+          showToast('✅ Account ban gaya! Ab login karo.', 'success');
+        }, 1400);
+      } else {
+        hideLoader(); showToast(data.message, 'error');
+      }
+    } catch(e) { hideLoader(); showToast('❌ Server error!', 'error'); }
+  }
+
+  function socialMsg() {
+    showToast('⚠️ Outh configure required to social login.', 'error');
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key==='Enter') {
+      if (document.getElementById('panel-login').classList.contains('active')) doLogin();
+      else doSignup();
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>History - Emotion Detection</title>
+  <style>
+/* ═══════════════════════════════════════
+   history.css — Emotion Detection History
+   ═══════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg:      #0a0e1a;
+  --bg2:     #080d18;
+  --card:    #0d1220;
+  --accent:  #00c8ff;
+  --accent2: #0077ff;
+  --green:   #00ff9d;
+  --red:     #ff4d6d;
+  --yellow:  #ffd60a;
+  --purple:  #7c3aed;
+  --pink:    #ec4899;
+  --text:    #e8f0ff;
+  --muted:   #7a8aaa;
+  --border:  rgba(0,200,255,0.12);
+  --glow:    rgba(0,200,255,0.12);
+}
+
+body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+#loader-bar { position: fixed; top: 0; left: 0; height: 2px; width: 0%; background: linear-gradient(90deg, var(--purple), var(--accent), var(--green)); z-index: 9999; transition: width 0.4s ease, opacity 0.4s; opacity: 0; box-shadow: 0 0 10px var(--accent); }
+
+/* HEADER */
+header { display: flex; align-items: center; justify-content: space-between; padding: 0 40px; height: 68px; background: rgba(10,14,26,0.92); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(16px); }
+.left-section { display: flex; align-items: center; gap: 16px; }
+.menu-toggle { display: flex; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+.menu-toggle span { display: block; width: 22px; height: 2px; background: var(--accent); border-radius: 2px; }
+.logo { font-size: 1.22rem; font-weight: 700; color: var(--accent); letter-spacing: 0.5px; }
+.top-nav { display: flex; align-items: center; gap: 6px; }
+.top-nav a { color: var(--muted); text-decoration: none; font-size: 0.88rem; font-weight: 500; padding: 8px 14px; border-radius: 8px; transition: all 0.2s; }
+.top-nav a:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+.dropdown { position: relative; }
+.dropdown-menu { display: none; position: absolute; top: calc(100% + 8px); left: 0; background: var(--card); border: 1px solid var(--border); border-radius: 12px; min-width: 170px; padding: 8px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+.dropdown:hover .dropdown-menu { display: block; }
+.dropdown-menu a { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; color: var(--muted); text-decoration: none; transition: all 0.2s; }
+.dropdown-menu a:hover { color: var(--accent); background: var(--glow); }
+.login-btn { background: linear-gradient(135deg, var(--accent), var(--accent2)) !important; color: #0a0e1a !important; padding: 9px 22px !important; border-radius: 10px !important; font-weight: 700 !important; }
+.login-btn:hover { box-shadow: 0 0 24px rgba(0,200,255,0.5) !important; }
+
+/* SIDEBAR */
+.sidebar { position: fixed; top: 0; left: -300px; width: 270px; height: 100%; background: var(--card); border-right: 1px solid var(--border); z-index: 200; transition: left 0.35s cubic-bezier(0.4,0,0.2,1); padding: 24px 0; display: flex; flex-direction: column; box-shadow: 8px 0 40px rgba(0,0,0,0.5); }
+.sidebar.active { left: 0; }
+.sidebar .close-btn { align-self: flex-end; margin-right: 20px; margin-bottom: 12px; width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border); background: none; color: var(--muted); cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.sidebar .close-btn:hover { color: var(--accent); border-color: var(--accent); }
+.sidebar a { display: flex; align-items: center; padding: 12px 24px; color: var(--muted); text-decoration: none; font-size: 0.92rem; border-left: 2px solid transparent; transition: all 0.22s; }
+.sidebar a:hover { color: var(--accent); border-left-color: var(--accent); background: var(--glow); }
+.sidebar-dropdown { overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.35s ease, opacity 0.3s; background: rgba(0,200,255,0.03); border-left: 2px solid var(--accent); }
+.sidebar-dropdown.open { max-height: 300px; opacity: 1; }
+.sidebar-dropdown a { padding: 10px 20px 10px 36px !important; font-size: 0.84rem !important; border-left: none !important; }
+.sidebar-toggle { display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; cursor: pointer; color: var(--muted); font-size: 0.92rem; border-left: 2px solid transparent; transition: all 0.22s; user-select: none; }
+.sidebar-toggle:hover { color: var(--accent); border-left-color: var(--accent); background: var(--glow); }
+.sidebar-toggle .arrow { font-size: 0.6rem; transition: transform 0.3s; }
+.sidebar-toggle.open .arrow { transform: rotate(180deg); color: var(--accent); }
+
+/* PAGE HERO */
+.page-hero { text-align: center; padding: 60px 20px 40px; background: radial-gradient(ellipse at 50% 60%, #0d1e3a 0%, var(--bg) 70%); border-bottom: 1px solid var(--border); }
+.tag { display: inline-block; background: rgba(0,200,255,0.08); border: 1px solid rgba(0,200,255,0.25); color: var(--accent); font-size: 0.72rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; margin-bottom: 16px; }
+.page-hero h1 { font-size: 2.4rem; font-weight: 700; margin-bottom: 10px; }
+.page-hero h1 span { color: var(--accent); }
+.page-hero p { color: var(--muted); font-size: 0.95rem; max-width: 500px; margin: 0 auto; line-height: 1.7; }
+
+/* TABS */
+.tabs-wrap { display: flex; justify-content: center; gap: 12px; padding: 30px 20px 0; }
+.tab-switch { padding: 10px 28px; border-radius: 10px; border: 1px solid var(--border); background: none; color: var(--muted); font-family: 'Poppins', sans-serif; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: all 0.22s; }
+.tab-switch.active { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #0a0e1a; border-color: transparent; box-shadow: 0 0 20px rgba(0,200,255,0.3); }
+.tab-switch:hover:not(.active) { border-color: var(--accent); color: var(--accent); }
+
+/* ══════════════════════════════
+   COMPANY TIMELINE
+══════════════════════════════ */
+.company-section { max-width: 800px; margin: 0 auto; padding: 50px 40px 80px; display: none; }
+.company-section.active { display: block; }
+
+.timeline { position: relative; padding-left: 40px; }
+.timeline::before { content: ''; position: absolute; left: 14px; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, var(--accent), var(--purple), transparent); border-radius: 2px; }
+
+.tl-item { position: relative; margin-bottom: 40px; }
+.tl-dot { position: absolute; left: -33px; top: 4px; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); border: 3px solid var(--bg); box-shadow: 0 0 12px rgba(0,200,255,0.5); }
+
+.tl-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 22px 24px; transition: all 0.3s; position: relative; overflow: hidden; }
+.tl-card::before { content: ''; position: absolute; left: 0; top: 0; width: 3px; height: 100%; background: linear-gradient(180deg, var(--accent), var(--purple)); opacity: 0; transition: opacity 0.3s; }
+.tl-card:hover { border-color: rgba(0,200,255,0.3); transform: translateX(4px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+.tl-card:hover::before { opacity: 1; }
+
+.tl-year { font-size: 0.72rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+.tl-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+.tl-card p { font-size: 0.85rem; color: var(--muted); line-height: 1.68; }
+.tl-badge { display: inline-block; margin-top: 10px; background: rgba(0,200,255,0.08); border: 1px solid rgba(0,200,255,0.2); color: var(--accent); font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.5px; }
+
+/* ══════════════════════════════
+   USER DETECTION HISTORY
+══════════════════════════════ */
+.detection-section { max-width: 1000px; margin: 0 auto; padding: 40px 40px 80px; display: none; }
+.detection-section.active { display: block; }
+
+/* Summary strip */
+.summary-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 32px; border: 1px solid var(--border); }
+.summary-box { background: var(--card); padding: 20px; text-align: center; }
+.summary-box h3 { font-size: 1.8rem; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+.summary-box p { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; }
+
+/* Filter row */
+.filter-row { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+.filter-btn { padding: 7px 18px; border-radius: 8px; border: 1px solid var(--border); background: none; color: var(--muted); font-family: 'Poppins', sans-serif; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.filter-btn.active, .filter-btn:hover { background: var(--glow); border-color: var(--accent); color: var(--accent); }
+.search-box { margin-left: auto; display: flex; align-items: center; gap: 0; background: var(--card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; transition: border-color 0.2s; }
+.search-box:focus-within { border-color: var(--accent); }
+.search-box input { background: none; border: none; outline: none; padding: 8px 14px; color: var(--text); font-family: 'Poppins', sans-serif; font-size: 0.85rem; width: 200px; }
+.search-box span { padding: 8px 12px; color: var(--muted); }
+
+/* History cards */
+.history-grid { display: flex; flex-direction: column; gap: 14px; }
+
+.hist-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 22px; display: flex; align-items: center; gap: 20px; transition: all 0.28s; cursor: pointer; }
+.hist-card:hover { border-color: rgba(0,200,255,0.3); transform: translateX(4px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+
+.hist-thumb { width: 60px; height: 60px; border-radius: 10px; object-fit: cover; border: 2px solid var(--border); flex-shrink: 0; background: var(--bg2); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
+.hist-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+
+.hist-info { flex: 1; }
+.hist-top { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.hist-emotion { font-size: 0.95rem; font-weight: 700; }
+.hist-conf { font-size: 0.72rem; color: var(--muted); background: rgba(0,200,255,0.06); border: 1px solid var(--border); padding: 2px 8px; border-radius: 20px; }
+.hist-meta { font-size: 0.78rem; color: var(--muted); display: flex; gap: 16px; }
+.hist-meta span { display: flex; align-items: center; gap: 5px; }
+
+/* Emotion bars mini */
+.hist-bars { display: flex; gap: 4px; align-items: flex-end; height: 32px; flex-shrink: 0; }
+.mini-bar { width: 8px; border-radius: 3px; background: rgba(0,200,255,0.15); transition: all 0.3s; }
+.mini-bar.active { background: linear-gradient(180deg, var(--accent), var(--purple)); }
+
+.hist-delete { background: none; border: 1px solid rgba(255,77,109,0.2); color: rgba(255,77,109,0.6); width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
+.hist-delete:hover { background: rgba(255,77,109,0.1); border-color: var(--red); color: var(--red); }
+
+/* Emotion color badges */
+.emo-happy    { color: #ffd60a; }
+.emo-sad      { color: #74b3ce; }
+.emo-angry    { color: var(--red); }
+.emo-neutral  { color: var(--muted); }
+.emo-surprise { color: var(--pink); }
+.emo-fear     { color: var(--purple); }
+.emo-disgust  { color: var(--green); }
+
+/* Empty state */
+.empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+.empty-state .big-icon { font-size: 4rem; margin-bottom: 16px; }
+.empty-state h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; color: var(--text); }
+.empty-state p { font-size: 0.88rem; }
+
+/* Clear all btn */
+.clear-btn { padding: 8px 20px; border-radius: 8px; border: 1px solid rgba(255,77,109,0.3); background: none; color: rgba(255,77,109,0.7); font-family: 'Poppins', sans-serif; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-left: auto; }
+.clear-btn:hover { background: rgba(255,77,109,0.1); border-color: var(--red); color: var(--red); }
+
+/* FOOTER */
+footer { text-align: center; padding: 28px 20px; color: #3a4a6a; font-size: 0.8rem; border-top: 1px solid var(--border); }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  header { padding: 0 20px; }
+  .top-nav { display: none; }
+  .summary-strip { grid-template-columns: repeat(2,1fr); }
+  .company-section, .detection-section { padding: 30px 20px 60px; }
+  .hist-card { flex-wrap: wrap; }
+  .search-box input { width: 140px; }
+}
+
+  </style>
+</head>
+<body>
+
+<div id="loader-bar"></div>
+
+<!-- ══ HEADER ══ -->
+<header>
+  <div class="left-section">
+    <div class="menu-toggle" onclick="openMenu()">
+      <span></span><span></span><span></span>
+    </div>
+    <div class="logo">Emotion Detection</div>
+  </div>
+  <nav class="top-nav">
+    <a href="/">Home</a>
+    <div class="dropdown">
+      <a href="#">Product ▾</a>
+      <div class="dropdown-menu">
+        <a href="/face-detection">🧠 Face Detection</a>
+      </div>
+    </div>
+    <div class="dropdown">
+      <a href="#">Use Case ▾</a>
+      <div class="dropdown-menu">
+        <a href="/education">🎓 Education</a>
+        <a href="/healthcare">🏥 Healthcare</a>
+        <a href="/security">🔒 Security</a>
+      </div>
+    </div>
+    <div class="dropdown">
+      <a href="#">API ▾</a>
+      <div class="dropdown-menu">
+        <a href="/documentation">📄 Documentation</a>
+      </div>
+    </div>
+    <a href="/login" class="login-btn">Login</a>
+  </nav>
+</header>
+
+<!-- ══ SIDEBAR ══ -->
+<div id="sidebar" class="sidebar">
+  <button class="close-btn" onclick="closeMenu()">✕</button>
+  <a href="/">🏠 Home</a>
+  <div class="sidebar-toggle" id="productToggle" onclick="toggleSidebar('product')">
+    <span>📦 Product</span><span class="arrow">▼</span>
+  </div>
+  <div class="sidebar-dropdown" id="productDropdown">
+    <a href="/face-detection">🧠 Face Detection</a>
+  </div>
+  <div class="sidebar-toggle" id="usecaseToggle" onclick="toggleSidebar('usecase')">
+    <span>💡 Use Case</span><span class="arrow">▼</span>
+  </div>
+  <div class="sidebar-dropdown" id="usecaseDropdown">
+    <a href="/education">🎓 Education</a>
+    <a href="/security">🔒 Security</a>
+    <a href="/healthcare">🏥 Healthcare</a>
+  </div>
+  <a href="#">⚙️ API</a>
+  <a href="/history">📜 History</a>
+  <a href="/contact">📞 Contact Us</a>
+  <a href="#">📄 Terms &amp; Conditions</a>
+</div>
+
+<!-- ══ HERO ══ -->
+<div class="page-hero">
+  <div class="tag">📜 Records</div>
+  <h1>Detection <span>History</span></h1>
+  <p>View your past emotion detections and explore our company journey — all in one place.</p>
+</div>
+
+<!-- ══ TAB SWITCHER ══ -->
+<div class="tabs-wrap">
+  <button class="tab-switch active" onclick="switchTab('detection')">🎯 My Detections</button>
+  <button class="tab-switch" onclick="switchTab('company')">🏢 Company History</button>
+</div>
+
+<!-- ══════════════════════════════════════════
+     TAB 1: USER DETECTION HISTORY
+══════════════════════════════════════════ -->
+<div class="detection-section active" id="detectionTab">
+
+  <!-- Summary -->
+  <div class="summary-strip">
+    <div class="summary-box">
+      <h3 id="totalCount">12</h3>
+      <p>Total Scans</p>
+    </div>
+    <div class="summary-box">
+      <h3 style="color:var(--yellow);">😊</h3>
+      <p>Most Detected</p>
+    </div>
+    <div class="summary-box">
+      <h3 id="avgConf">87%</h3>
+      <p>Avg Confidence</p>
+    </div>
+    <div class="summary-box">
+      <h3 id="todayCount">3</h3>
+      <p>Today</p>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-row">
+    <button class="filter-btn active" onclick="filterHistory('all', this)">All</button>
+    <button class="filter-btn" onclick="filterHistory('happy', this)">😊 Happy</button>
+    <button class="filter-btn" onclick="filterHistory('sad', this)">😢 Sad</button>
+    <button class="filter-btn" onclick="filterHistory('angry', this)">😠 Angry</button>
+    <button class="filter-btn" onclick="filterHistory('neutral', this)">😐 Neutral</button>
+    <button class="filter-btn" onclick="filterHistory('surprise', this)">😲 Surprise</button>
+    <button class="clear-btn" onclick="clearAll()">🗑 Clear All</button>
+    <div class="search-box">
+      <span>🔍</span>
+      <input type="text" placeholder="Search..." oninput="searchHistory(this.value)">
+    </div>
+  </div>
+
+  <!-- History Cards -->
+  <div class="history-grid" id="historyGrid"></div>
+
+</div>
+
+<!-- ══════════════════════════════════════════
+     TAB 2: COMPANY HISTORY TIMELINE
+══════════════════════════════════════════ -->
+<div class="company-section" id="companyTab">
+  <div class="timeline">
+
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-card">
+        <div class="tl-year">2019 — Founded</div>
+        <h3>🚀 The Beginning</h3>
+        <p>Emotion Detection was founded by a team of AI researchers and engineers with a vision to make emotional intelligence accessible to everyone through technology. The idea began in a university lab in Bengaluru, India.</p>
+        <span class="tl-badge">Founding</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot" style="background:var(--purple);box-shadow:0 0 12px rgba(124,58,237,0.5);"></div>
+      <div class="tl-card">
+        <div class="tl-year">2020 — First Model</div>
+        <h3>🧠 DeepFace Integration</h3>
+        <p>We launched our first working prototype using DeepFace and OpenCV capable of detecting 7 core emotions — happy, sad, angry, neutral, fear, surprise, and disgust — with 91% accuracy on benchmark datasets.</p>
+        <span class="tl-badge">AI Milestone</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot" style="background:var(--green);box-shadow:0 0 12px rgba(0,255,157,0.5);"></div>
+      <div class="tl-card">
+        <div class="tl-year">2021 — Public Beta</div>
+        <h3>🌐 Web Platform Launch</h3>
+        <p>Launched the public beta of our web platform with image upload and live webcam detection. Within 3 months, over 10,000 users signed up and performed 500,000+ emotion detections.</p>
+        <span class="tl-badge">500K Detections</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot" style="background:var(--yellow);box-shadow:0 0 12px rgba(255,214,10,0.5);"></div>
+      <div class="tl-card">
+        <div class="tl-year">2022 — API Release</div>
+        <h3>⚙️ REST API v1.0</h3>
+        <p>Released our REST API allowing developers to integrate emotion detection into their own applications. Within 6 months, 200+ companies integrated our API including EdTech, Healthcare, and Security sectors.</p>
+        <span class="tl-badge">200+ Integrations</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot" style="background:var(--pink);box-shadow:0 0 12px rgba(236,72,153,0.5);"></div>
+      <div class="tl-card">
+        <div class="tl-year">2023 — Series A Funding</div>
+        <h3>💰 ₹12 Crore Raised</h3>
+        <p>Secured Series A funding of ₹12 Crore from prominent venture capitalists. Used the investment to expand our engineering team, improve model accuracy to 99.3%, and launch enterprise-grade solutions.</p>
+        <span class="tl-badge">Series A</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot" style="background:var(--accent);box-shadow:0 0 12px rgba(0,200,255,0.5);"></div>
+      <div class="tl-card">
+        <div class="tl-year">2024 — 1 Million Users</div>
+        <h3>🎉 1M+ Detections Milestone</h3>
+        <p>Crossed the 1 million emotion detection milestone. Expanded to 3 new use case verticals — Education, Healthcare, and Security. Launched batch processing API and WebSocket live stream support.</p>
+        <span class="tl-badge">1M+ Milestone</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot" style="background:var(--accent);box-shadow:0 0 16px rgba(0,200,255,0.7);animation:glowPulse 2s infinite;"></div>
+      <div class="tl-card" style="border-color:rgba(0,200,255,0.3);">
+        <div class="tl-year">2025 — Present</div>
+        <h3>🌟 API v2.0 &amp; Global Expansion</h3>
+        <p>Launched API v2.0 with 80ms response time, age estimation, gender detection, and landmark analysis. Currently serving 50,000+ active users across 40+ countries. Headquarters in Gaya, Bihar with remote teams worldwide.</p>
+        <span class="tl-badge" style="background:rgba(0,200,255,0.15);border-color:rgba(0,200,255,0.4);">🔴 Live</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>&copy; 2025 Emotion Detection. All rights reserved.</footer>
+
+<style>
+@keyframes glowPulse { 0%,100%{box-shadow:0 0 12px rgba(0,200,255,0.5)} 50%{box-shadow:0 0 24px rgba(0,200,255,0.9)} }
+</style>
+
+<script>
+/* ── SIDEBAR ── */
+function openMenu()  { document.getElementById('sidebar').classList.add('active'); }
+function closeMenu() { document.getElementById('sidebar').classList.remove('active'); }
+function toggleSidebar(s) {
+  const d = document.getElementById(s+'Dropdown'), t = document.getElementById(s+'Toggle');
+  d.classList.toggle('open', !d.classList.contains('open'));
+  t.classList.toggle('open', !t.classList.contains('open'));
+}
+
+/* ── TAB SWITCH ── */
+function switchTab(tab) {
+  document.querySelectorAll('.tab-switch').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('detectionTab').classList.toggle('active', tab === 'detection');
+  document.getElementById('companyTab').classList.toggle('active',   tab === 'company');
+}
+
+/* ── DETECTION HISTORY DATA ── */
+const EMOJI = { happy:'😊', sad:'😢', angry:'😠', neutral:'😐', surprise:'😲', fear:'😨', disgust:'🤢' };
+const COLOR = { happy:'emo-happy', sad:'emo-sad', angry:'emo-angry', neutral:'emo-neutral', surprise:'emo-surprise', fear:'emo-fear', disgust:'emo-disgust' };
+
+// Sample history data (in real app this comes from Flask/DB)
+let historyData = JSON.parse(localStorage.getItem('emotionHistory') || 'null') || [
+  { id:1,  emotion:'happy',   confidence:92, age:26, gender:'Female', time:'Today, 10:32 AM',   icon:'😊' },
+  { id:2,  emotion:'neutral', confidence:78, age:34, gender:'Male',   time:'Today, 09:15 AM',   icon:'😐' },
+  { id:3,  emotion:'sad',     confidence:85, age:22, gender:'Female', time:'Today, 08:44 AM',   icon:'😢' },
+  { id:4,  emotion:'angry',   confidence:91, age:29, gender:'Male',   time:'Yesterday, 06:20 PM', icon:'😠' },
+  { id:5,  emotion:'surprise',confidence:88, age:19, gender:'Female', time:'Yesterday, 04:10 PM', icon:'😲' },
+  { id:6,  emotion:'happy',   confidence:95, age:45, gender:'Male',   time:'Yesterday, 02:30 PM', icon:'😊' },
+  { id:7,  emotion:'fear',    confidence:76, age:31, gender:'Female', time:'10 May, 11:00 AM',  icon:'😨' },
+  { id:8,  emotion:'neutral', confidence:82, age:27, gender:'Male',   time:'10 May, 09:45 AM',  icon:'😐' },
+  { id:9,  emotion:'happy',   confidence:97, age:24, gender:'Female', time:'09 May, 03:15 PM',  icon:'😊' },
+  { id:10, emotion:'disgust', confidence:73, age:38, gender:'Male',   time:'09 May, 01:00 PM',  icon:'🤢' },
+  { id:11, emotion:'sad',     confidence:80, age:20, gender:'Female', time:'08 May, 05:30 PM',  icon:'😢' },
+  { id:12, emotion:'angry',   confidence:89, age:33, gender:'Male',   time:'08 May, 11:20 AM',  icon:'😠' },
+];
+
+let filteredData = [...historyData];
+
+function renderHistory(data) {
+  const grid = document.getElementById('historyGrid');
+  if (data.length === 0) {
+    grid.innerHTML = `<div class="empty-state"><div class="big-icon">🔍</div><h3>No detections found</h3><p>Upload an image to start detecting emotions!</p></div>`;
+    return;
+  }
+  grid.innerHTML = data.map(item => `
+    <div class="hist-card" data-id="${item.id}" data-emotion="${item.emotion}">
+      <div class="hist-thumb">${item.icon}</div>
+      <div class="hist-info">
+        <div class="hist-top">
+          <span class="hist-emotion ${COLOR[item.emotion]}">${EMOJI[item.emotion]} ${capitalize(item.emotion)}</span>
+          <span class="hist-conf">${item.confidence}% confidence</span>
+        </div>
+        <div class="hist-meta">
+          <span>🕐 ${item.time}</span>
+          <span>👤 Age ~${item.age}</span>
+          <span>⚧ ${item.gender}</span>
+        </div>
+      </div>
+      <div class="hist-bars">
+        ${generateMiniBars(item.emotion)}
+      </div>
+      <button class="hist-delete" onclick="deleteItem(${item.id})" title="Delete">🗑</button>
+    </div>
+  `).join('');
+  updateStats(data);
+}
+
+function generateMiniBars(dominant) {
+  const emotions = ['happy','sad','angry','neutral','surprise','fear','disgust'];
+  return emotions.map(e => {
+    const h = e === dominant ? 28 : Math.floor(Math.random()*14+4);
+    return `<div class="mini-bar ${e===dominant?'active':''}" style="height:${h}px;"></div>`;
+  }).join('');
+}
+
+function updateStats(data) {
+  document.getElementById('totalCount').textContent = historyData.length;
+  const conf = data.length ? Math.round(data.reduce((a,b)=>a+b.confidence,0)/data.length) : 0;
+  document.getElementById('avgConf').textContent = conf + '%';
+  const today = historyData.filter(d => d.time.startsWith('Today')).length;
+  document.getElementById('todayCount').textContent = today;
+}
+
+function capitalize(s) { return s ? s.charAt(0).toUpperCase()+s.slice(1) : ''; }
+
+function filterHistory(emotion, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filteredData = emotion === 'all' ? [...historyData] : historyData.filter(d => d.emotion === emotion);
+  renderHistory(filteredData);
+}
+
+function searchHistory(query) {
+  const q = query.toLowerCase();
+  const searched = filteredData.filter(d =>
+    d.emotion.includes(q) || d.time.toLowerCase().includes(q) || d.gender.toLowerCase().includes(q)
+  );
+  renderHistory(searched);
+}
+
+function deleteItem(id) {
+  historyData = historyData.filter(d => d.id !== id);
+  filteredData = filteredData.filter(d => d.id !== id);
+  localStorage.setItem('emotionHistory', JSON.stringify(historyData));
+  renderHistory(filteredData);
+}
+
+function clearAll() {
+  if (!confirm('Saari detection history delete karni hai?')) return;
+  historyData = []; filteredData = [];
+  localStorage.removeItem('emotionHistory');
+  renderHistory([]);
+}
+
+/* ── LOADER ── */
+document.querySelectorAll('a').forEach(l => l.addEventListener('click', () => {
+  let b = document.getElementById('loader-bar'); b.style.opacity='1'; b.style.width='100%';
+}));
+window.onload = () => {
+  let b = document.getElementById('loader-bar'); b.style.width='100%';
+  setTimeout(()=>{b.style.opacity='0';b.style.width='0%';},400);
+  renderHistory(historyData);
+};
+</script>
+
+</body>
+</html>

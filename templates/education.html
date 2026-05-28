@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Education Use Case</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/education.css') }}">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+</head>
+
+<body class="edu-body">
+
+<!-- NAVBAR -->
+<header class="edu-header">
+
+<div class="logo">EmotionAI</div>
+
+<nav class="edu-nav">
+<a href="/">Home</a>
+<a href="/education">Education</a>
+<a href="/login">Login</a>
+</nav>
+
+</header>
+
+
+<!-- IMAGE BANNER -->
+<div class="edu-banner">
+    <img src="https://images.unsplash.com/photo-1588072432836-e10032774350" alt="Education Banner">
+    <div class="banner-text">
+        <h2>AI in Education</h2>
+        <p>Enhancing learning through emotion detection</p>
+    </div>
+</div>
+
+
+
+<h1 class="edu-heading">Education Use Case</h1>
+
+<!-- INTRO CONTENT -->
+<div class="edu-intro">
+
+<p>
+Face emotion detection in education helps teachers understand student behavior,
+attention, and emotional responses during lectures.
+</p>
+
+<p>
+It enables real-time monitoring of engagement levels, allowing educators to
+improve teaching strategies and create a more interactive learning environment.
+</p>
+
+</div>
+
+<!-- BOXES -->
+<div class="edu-container">
+
+<div class="edu-card" onclick="location.href='/student-engagement'">
+<h3>Student Engagement</h3>
+<p>Track attention and participation using AI.</p>
+</div>
+
+<div class="edu-card" onclick="location.href='/focus-detection'">
+<h3>Focus Detection</h3>
+<p>Identify boredom, confusion, and distraction.</p>
+</div>
+
+<div class="edu-card" onclick="location.href='/smart-learning'">
+<h3>Smart Learning</h3>
+<p>Enhance learning using emotion-based insights.</p>
+</div>
+
+</div>
+
+</body>
+</html>

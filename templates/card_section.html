@@ -1,0 +1,59 @@
+<!-- FEATURES — replace karo index.html mein cards-grid section -->
+<div class="cards-grid">
+
+  <!-- 1. Live Detection — Work in Progress popup -->
+  <div class="feat-card" onclick="showWIP()" style="cursor:pointer;">
+    <div class="feat-icon">🎥</div>
+    <h3>Live Detection</h3>
+    <p>Real-time emotion analysis directly from your webcam with zero latency frame processing.</p>
+  </div>
+
+  <!-- 2. Image Upload — /upload-page -->
+  <div class="feat-card" onclick="window.location.href='/upload-page'" style="cursor:pointer;">
+    <div class="feat-icon">🖼️</div>
+    <h3>Image Upload</h3>
+    <p>Upload any image and get detailed emotion breakdowns with confidence scores for every face.</p>
+  </div>
+
+  <!-- 3. Analytics — /analytics -->
+  <div class="feat-card" onclick="window.location.href='/analytics'" style="cursor:pointer;">
+    <div class="feat-icon">📊</div>
+    <h3>Analytics</h3>
+    <p>Deep insights, heatmaps, and emotion timelines to understand patterns over time.</p>
+  </div>
+
+  <!-- 4. REST API — /documentation -->
+  <div class="feat-card" onclick="window.location.href='/documentation'" style="cursor:pointer;">
+    <div class="feat-icon">⚙️</div>
+    <h3>REST API</h3>
+    <p>Integrate into any app with our well-documented REST API. Supports Python, JS, and more.</p>
+  </div>
+
+</div>
+
+<!-- WIP Modal -->
+<div id="wipModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#0d1117;border:1px solid #1e293b;border-radius:20px;padding:2.5rem 2rem;max-width:400px;width:90%;text-align:center;position:relative;">
+    <div style="font-size:52px;margin-bottom:16px;">🚧</div>
+    <h3 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#e2eaff;margin-bottom:10px;letter-spacing:-0.5px;">Work In Progress</h3>
+    <p style="font-size:14px;color:#64748b;line-height:1.7;margin-bottom:24px;">Live Detection feature abhi develop ho raha hai.<br>Please stay patient — coming soon! ⚡</p>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button onclick="closeWIP()" style="padding:10px 28px;background:linear-gradient(135deg,#1e40af,#3b82f6);border:none;border-radius:10px;color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:0.5px;">Got it!</button>
+      <a href="/camera" style="padding:10px 28px;background:transparent;border:1px solid #1e293b;border-radius:10px;color:#64748b;font-size:14px;font-weight:700;text-decoration:none;display:flex;align-items:center;font-family:'DM Sans',sans-serif;">Try Anyway →</a>
+    </div>
+  </div>
+</div>
+
+<script>
+function showWIP() {
+  const m = document.getElementById('wipModal');
+  m.style.display = 'flex';
+}
+function closeWIP() {
+  document.getElementById('wipModal').style.display = 'none';
+}
+// Close on outside click
+document.getElementById('wipModal').addEventListener('click', function(e) {
+  if (e.target === this) closeWIP();
+});
+</script>
